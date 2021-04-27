@@ -12,13 +12,13 @@
 <div class="form-group">
   <label>
     User: 
-    <span>@userName</span>
+    <span>@_userName</span>
   </label>
 </div>
 <div class="form-group">
   <label>
     Message:
-    <input @bind="messageInput" size="50" />
+    <input @bind="_messageInput" size="50" />
   </label>
 </div>
 <button @onclick="Send" disabled="@(!IsConnected)">Send</button>
@@ -26,55 +26,8 @@
 <hr>
 
 <ul id="messagesList">
-  @foreach (var message in messages)
+  @foreach (var message in _messages)
   {
     <li>@message</li>
   }
 </ul>
-
-@code {
-  private HubConnection hubConnection;
-  private List<string> messages = new List<string>();
-  private string messageInput;
-  private string userName;
-
-  protected override async Task OnInitializedAsync()
-  {
-    var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-    var user = authState.User;
-
-    userName = user.Identity.Name;
-
-    hubConnection = new HubConnectionBuilder()
-      .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"), options =>
-      {
-        options.AccessTokenProvider = async () =>
-        {
-          var accessTokenResult = await AccessTokenProvider.RequestAccessToken();
-          accessTokenResult.TryGetToken(out var accessToken);
-          return accessToken.Value;
-        };
-      })
-      .Build();
-
-    hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
-    {
-      var encodedMsg = $"{user}: {message}";
-      messages.Add(encodedMsg);
-      StateHasChanged();
-    });
-
-    await hubConnection.StartAsync();
-  }
-
-  async Task Send() =>
-    await hubConnection.SendAsync("SendMessage", userName, messageInput);
-
-  public bool IsConnected =>
-    hubConnection.State == HubConnectionState.Connected;
-
-  public async ValueTask DisposeAsync()
-  {
-    await hubConnection.DisposeAsync();
-  }
-}
