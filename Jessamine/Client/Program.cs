@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Fluxor;
 
 namespace Jessamine.Client
 {
@@ -25,6 +26,12 @@ namespace Jessamine.Client
       builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("Jessamine.ServerAPI"));
 
       builder.Services.AddApiAuthorization();
+
+      builder.Services.AddFluxor(config =>
+      {
+        config.ScanAssemblies(typeof(Program).Assembly);
+        config.UseReduxDevTools();
+      });
 
       await builder.Build().RunAsync();
     }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Fluxor.Blazor.Web.Components;
+using Jessamine.Client.State.Chat.Actions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -41,14 +43,33 @@ namespace Jessamine.Client.Pages
         StateHasChanged();
       });
 
+      _hubConnection.On<bool, string>("ConnectWithUser", (isConnected, connectedUserConnectionId) =>
+      {
+        _dispatcher.Dispatch(new StartConversation(connectedUserConnectionId, isConnected));
+      });
+
+      _hubConnection.On("EndConversation", async () =>
+      {
+        _dispatcher.Dispatch(new EndConversation());
+
+        await _hubConnection.SendAsync("QueueForConversation");
+      });
+
       await _hubConnection.StartAsync();
+    }
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+      if (firstRender)
+      {
+        await _hubConnection.SendAsync("QueueForConversation");
+      }
     }
 
     async Task Send() =>
       await _hubConnection.SendAsync("SendMessage", _userName, _messageInput);
 
-    public bool IsConnected =>
-      _hubConnection.State == HubConnectionState.Connected;
+    public bool IsConnected => _chatState.Value.IsConnected;
 
     public async ValueTask DisposeAsync()
     {

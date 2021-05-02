@@ -18,11 +18,37 @@ namespace Jessamine.Server.Hubs
       _pairingProvider = pairingProvider;
     }
 
-    public override Task OnConnectedAsync()
+    public async Task QueueForConversation()
     {
-      _pairingProvider.PairUser(Context.ConnectionId);
+      try
+      {
+        var isSuccessful = _pairingProvider.PairUser(Context.ConnectionId);
 
-      return base.OnConnectedAsync();
+        if (isSuccessful)
+        {
+          string pairedUserConnectionId = _pairingProvider.FindPair(Context.ConnectionId);
+
+          await Clients.Client(pairedUserConnectionId).SendAsync("ConnectWithUser", true, Context.ConnectionId);
+
+          await Clients.Client(Context.ConnectionId).SendAsync("ConnectWithUser", true, pairedUserConnectionId);
+        }
+      }
+      catch (Exception e)
+      {
+        throw;
+      }
+    }
+
+    public override Task OnDisconnectedAsync(Exception? exception)
+    {
+      var pair = _pairingProvider.RemovePair(Context.ConnectionId);
+
+      if (pair != null)
+      {
+        Clients.Clients(new[]{ pair.FirstUser, pair.SecondUser }).SendAsync("EndConversation");
+      }
+      
+      return base.OnDisconnectedAsync(exception);
     }
 
     public async Task SendMessage(string user, string message)

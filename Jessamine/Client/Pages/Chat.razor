@@ -2,16 +2,21 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Microsoft.AspNetCore.Authorization
+@using Jessamine.Client.State.Chat
 
 @inject NavigationManager NavigationManager
 @inject IAccessTokenProvider AccessTokenProvider
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @implements IAsyncDisposable
 @attribute [Authorize]
+@inject IState<ChatState> _chatState
+@inherits FluxorComponent
+@inject IDispatcher _dispatcher
 
+@if (IsConnected){
 <div class="form-group">
   <label>
-    User: 
+    User:
     <span>@_userName</span>
   </label>
 </div>
@@ -21,7 +26,7 @@
     <input @bind="_messageInput" size="50" />
   </label>
 </div>
-<button @onclick="Send" disabled="@(!IsConnected)">Send</button>
+<button class="btn btn-primary" @onclick="Send" disabled="@(!IsConnected)">Send</button>
 
 <hr>
 
@@ -31,3 +36,9 @@
     <li>@message</li>
   }
 </ul>
+}
+else
+{
+  <div>Connecting with another user...</div>
+}
+
