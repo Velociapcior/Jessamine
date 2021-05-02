@@ -17,5 +17,9 @@ namespace Jessamine.Server.Data
         IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
     {
     }
+
+    public DbSet<Conversation> Conversations { get; set; }
+
+    public DbSet<Message> Messages { get; set; }
   }
 }

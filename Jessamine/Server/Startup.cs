@@ -35,7 +35,10 @@ namespace Jessamine.Server
 
       services.AddDatabaseDeveloperPageExceptionFilter();
 
-      services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+      services.AddDefaultIdentity<ApplicationUser>(options =>
+        {
+          options.SignIn.RequireConfirmedAccount = true;
+        })
           .AddEntityFrameworkStores<ApplicationDbContext>();
 
       services.AddIdentityServer()
