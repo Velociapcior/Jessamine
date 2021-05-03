@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System.Security.Claims;
 using Fluxor.DependencyInjection;
+using IdentityServer4.Services;
 using Jessamine.Server.Hubs;
 using Jessamine.Server.Services;
 using Jessamine.Server.Services.Interfaces;
@@ -46,6 +47,10 @@ namespace Jessamine.Server
       services.AddIdentityServer()
           .AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
           {
+            options.IdentityResources["openid"].UserClaims.Add("name");
+            options.ApiResources.Single().UserClaims.Add("name");
+            options.IdentityResources["openid"].UserClaims.Add("role");
+            options.ApiResources.Single().UserClaims.Add("role");
           });
 
       services.AddAuthentication()
@@ -62,6 +67,7 @@ namespace Jessamine.Server
 
       services.AddSingleton<IConnectionMapping<string>, ConnectionMapping<string>>();
       services.AddSingleton<IPairingProvider, PairingProvider>();
+      services.AddTransient<IProfileService, ProfileService>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
