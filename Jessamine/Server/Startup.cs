@@ -16,6 +16,7 @@ using IdentityServer4.Services;
 using Jessamine.Server.Hubs;
 using Jessamine.Server.Services;
 using Jessamine.Server.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 namespace Jessamine.Server
 {
@@ -68,6 +69,11 @@ namespace Jessamine.Server
       services.AddSingleton<IConnectionMapping<string>, ConnectionMapping<string>>();
       services.AddSingleton<IPairingProvider, PairingProvider>();
       services.AddTransient<IProfileService, ProfileService>();
+
+      services.Configure<IdentityOptions>(options =>
+      {
+        options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
+      });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

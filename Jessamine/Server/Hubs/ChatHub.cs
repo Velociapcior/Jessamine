@@ -113,7 +113,7 @@ namespace Jessamine.Server.Hubs
       _context.Messages.Add(message);
 
       await _context.SaveChangesAsync();
-
+      await Clients.Caller.SendAsync("ReceiveMessage", from.UserName, content);
       await Clients.Client(connectionId).SendAsync("ReceiveMessage", from.UserName, content);
     }
   }

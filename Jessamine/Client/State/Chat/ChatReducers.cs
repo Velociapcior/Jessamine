@@ -13,7 +13,8 @@ namespace Jessamine.Client.State.Chat
     public static ChatState OnStartConversation(ChatState state, StartConversation action) => state with
     {
       IsConnected = action.IsConnected,
-      ConnectedUserId = action.ConnectionId
+      ConnectedUserId = action.ConnectionId,
+      ConversationId = action.ConversationId
     };
 
     [ReducerMethod]

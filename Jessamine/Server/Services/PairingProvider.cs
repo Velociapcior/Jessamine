@@ -72,13 +72,15 @@ namespace Jessamine.Server.Services
 
     public Pair RemovePair(string connectionId)
     {
-      var pair = _pairedUsers.First(x => x.FirstUser == connectionId || x.SecondUser == connectionId);
-
-      bool isRemoved = _pairedUsers.TryTake(out pair);
-
-      if (isRemoved)
+      var pair = _pairedUsers.FirstOrDefault(x => x.FirstUser == connectionId || x.SecondUser == connectionId);
+      if (pair != null)
       {
-        return pair;
+        bool isRemoved = _pairedUsers.TryTake(out pair);
+
+        if (isRemoved)
+        {
+          return pair;
+        }
       }
 
       return null;
