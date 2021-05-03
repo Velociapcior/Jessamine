@@ -19,7 +19,7 @@ namespace Jessamine.Server.Services
 
     public bool PairUser(string connectionId)
     {
-      var pair = _pairedUsers.FirstOrDefault(x => string.IsNullOrEmpty(x.SecondUser));
+      var pair = _pairedUsers.FirstOrDefault(x => string.IsNullOrEmpty(x.SecondUser) && x.FirstUser != connectionId);
 
       if (pair == null)
       {

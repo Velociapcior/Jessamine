@@ -16,6 +16,9 @@ namespace Jessamine.Server.Services
       var nameClaim = context.Subject.FindAll(JwtClaimTypes.Name);
       context.IssuedClaims.AddRange(nameClaim);
 
+      var givenNameClaim = context.Subject.FindAll(JwtClaimTypes.GivenName);
+      context.IssuedClaims.AddRange(givenNameClaim);
+
       var roleClaims = context.Subject.FindAll(JwtClaimTypes.Role);
       context.IssuedClaims.AddRange(roleClaims);
 

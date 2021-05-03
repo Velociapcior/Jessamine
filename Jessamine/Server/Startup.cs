@@ -12,6 +12,8 @@ using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System.Security.Claims;
 using Fluxor.DependencyInjection;
+using IdentityModel;
+using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Jessamine.Server.Hubs;
 using Jessamine.Server.Services;
@@ -50,6 +52,8 @@ namespace Jessamine.Server
           {
             options.IdentityResources["openid"].UserClaims.Add("name");
             options.ApiResources.Single().UserClaims.Add("name");
+            options.IdentityResources["openid"].UserClaims.Add(JwtClaimTypes.GivenName);
+            options.ApiResources.Single().UserClaims.Add(JwtClaimTypes.GivenName);
             options.IdentityResources["openid"].UserClaims.Add("role");
             options.ApiResources.Single().UserClaims.Add("role");
           });
