@@ -20,7 +20,8 @@ namespace Jessamine.Client.State.Chat
     public static ChatState OnEndConversation(ChatState state, EndConversation action) => state with
     {
       IsConnected = false,
-      ConnectedUserId = string.Empty
+      ConnectedUserId = string.Empty,
+      ConversationId = -1
     };
   }
 }

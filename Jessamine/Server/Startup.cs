@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using System.Security.Claims;
+using Fluxor.DependencyInjection;
 using Jessamine.Server.Hubs;
 using Jessamine.Server.Services;
 using Jessamine.Server.Services.Interfaces;
@@ -42,7 +44,9 @@ namespace Jessamine.Server
           .AddEntityFrameworkStores<ApplicationDbContext>();
 
       services.AddIdentityServer()
-          .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+          .AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
+          {
+          });
 
       services.AddAuthentication()
           .AddIdentityServerJwt();
@@ -56,6 +60,7 @@ namespace Jessamine.Server
           new[] { "application/octet-stream" });
       });
 
+      services.AddSingleton<IConnectionMapping<string>, ConnectionMapping<string>>();
       services.AddSingleton<IPairingProvider, PairingProvider>();
     }
 

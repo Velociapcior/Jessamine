@@ -42,10 +42,10 @@ namespace Jessamine.Client.Pages
         _messages.Add(encodedMsg);
         StateHasChanged();
       });
-
-      _hubConnection.On<bool, string>("ConnectWithUser", (isConnected, connectedUserConnectionId) =>
+       
+      _hubConnection.On<bool, string, long>("ConnectWithUser", (isConnected, connectedUserConnectionId, conversationId) =>
       {
-        _dispatcher.Dispatch(new StartConversation(connectedUserConnectionId, isConnected));
+        _dispatcher.Dispatch(new StartConversation(connectedUserConnectionId, isConnected, conversationId));
       });
 
       _hubConnection.On("EndConversation", async () =>
@@ -67,7 +67,7 @@ namespace Jessamine.Client.Pages
     }
 
     async Task Send() =>
-      await _hubConnection.SendAsync("SendMessage", _userName, _messageInput);
+      await _hubConnection.SendAsync("SendMessage", _chatState.Value.ConnectedUserId, _messageInput, _chatState.Value.ConversationId);
 
     public bool IsConnected => _chatState.Value.IsConnected;
 

@@ -11,6 +11,7 @@ namespace Jessamine.Client.State.Chat
   {
     public string ConnectedUserId { get; init; }
     public bool IsConnected { get; init; }
+    public long ConversationId { get; set; }
   }
 
   public class ChatFeatureState : Feature<ChatState>
@@ -20,7 +21,8 @@ namespace Jessamine.Client.State.Chat
     protected override ChatState GetInitialState() => new ChatState
     {
       ConnectedUserId = string.Empty,
-      IsConnected = false
+      IsConnected = false,
+      ConversationId = -1
     };
   }
 }

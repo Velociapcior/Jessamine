@@ -9,11 +9,13 @@ namespace Jessamine.Client.State.Chat.Actions
   {
     public string ConnectionId { get; init; }
     public bool IsConnected { get; init; }
+    public long ConversationId { get; set; }
 
-    public StartConversation(string connectionId, bool isConnected)
+    public StartConversation(string connectionId, bool isConnected, long conversationId)
     {
       ConnectionId = connectionId;
       IsConnected = isConnected;
+      ConversationId = conversationId;
     }
   }
 

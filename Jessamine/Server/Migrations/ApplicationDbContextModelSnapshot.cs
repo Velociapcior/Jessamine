@@ -4,16 +4,14 @@ using Jessamine.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Jessamine.Server.Data.Migrations
+namespace Jessamine.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210502203236_ConversationsAndMessages")]
-    partial class ConversationsAndMessages
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -201,7 +199,7 @@ namespace Jessamine.Server.Data.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUsers");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Jessamine.Server.Models.Conversation", b =>
@@ -235,6 +233,12 @@ namespace Jessamine.Server.Data.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("From")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("To")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ConversationId");
@@ -266,7 +270,7 @@ namespace Jessamine.Server.Data.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("AspNetRoles");
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -290,7 +294,7 @@ namespace Jessamine.Server.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims");
+                    b.ToTable("RoleClaims");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -314,7 +318,7 @@ namespace Jessamine.Server.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims");
+                    b.ToTable("UserClaims");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -338,7 +342,7 @@ namespace Jessamine.Server.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins");
+                    b.ToTable("UserLogins");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -353,7 +357,7 @@ namespace Jessamine.Server.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles");
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -374,7 +378,7 @@ namespace Jessamine.Server.Data.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens");
+                    b.ToTable("UserTokens");
                 });
 
             modelBuilder.Entity("ApplicationUserConversation", b =>

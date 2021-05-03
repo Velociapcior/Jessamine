@@ -9,6 +9,8 @@ namespace Jessamine.Server.Models
       FirstUser = firstUser;
     }
 
+    public long ConversationId { get; set; }
+
     public string FirstUser { get; set; }
 
     public string SecondUser { get; set; }

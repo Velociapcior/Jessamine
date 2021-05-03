@@ -47,6 +47,29 @@ namespace Jessamine.Server.Services
       return pair.FirstUser;
     }
 
+    public Pair GetPair(string firstParticipant, string secondParticipant)
+    {
+      Pair pair = _pairedUsers.Single(x => 
+        x.FirstUser == firstParticipant && x.SecondUser == secondParticipant ||
+        x.FirstUser == secondParticipant && x.SecondUser == firstParticipant);
+
+      return pair;
+    }
+
+    public Pair GetPair(long conversationId)
+    {
+      Pair pair = _pairedUsers.Single(x => x.ConversationId == conversationId);
+
+      return pair;
+    }
+
+    public void SetConversation(string firstParticipant, string secondParticipant, long conversationId)
+    {
+      Pair pair = GetPair(firstParticipant, secondParticipant);
+
+      pair.ConversationId = conversationId;
+    }
+
     public Pair RemovePair(string connectionId)
     {
       var pair = _pairedUsers.First(x => x.FirstUser == connectionId || x.SecondUser == connectionId);

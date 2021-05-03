@@ -11,6 +11,12 @@ namespace Jessamine.Server.Services.Interfaces
 
     string FindPair(string connectionId);
 
+    Pair GetPair(string firstParticipant, string secondParticipant);
+
+    Pair GetPair(long conversationId);
+
+    void SetConversation(string firstParticipant, string secondParticipant, long conversationId);
+
     Pair RemovePair(string connectionId);
   }
 }
