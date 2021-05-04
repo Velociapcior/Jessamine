@@ -1,0 +1,30 @@
+﻿@inject IState<MessengerState> _state
+@inherits FluxorComponent
+
+<div class="px-0">
+  <div class="px-4 py-5 chat-box bg-white">
+    @foreach (Jessamine.Shared.Message msg in Messages)
+    {
+      <Message SentByUser="@(UserName==msg.From)" From="@msg.From"  Content="@msg.Content" Date="msg.Date" />
+    }
+
+  </div>
+</div>
+
+<div class="input-group">
+  <input @bind="_messageInput" type="text" placeholder="Type a message" aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light" />
+  <div class="input-group-append">
+    <button @onclick="@(()=> OnClick.InvokeAsync(_messageInput))"  id="button-addon2" class="btn btn-link"> <i class="far fa-paper-plane"></i></button>
+  </div>
+</div>
+
+@code {
+  [Parameter]
+  public string UserName { get; set; }
+
+  [Parameter] public EventCallback<string> OnClick { get; set; }
+  private string _messageInput;
+
+  private List<Jessamine.Shared.Message> Messages => _state.Value.Messages;
+
+}

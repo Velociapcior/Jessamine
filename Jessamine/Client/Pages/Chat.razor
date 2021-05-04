@@ -1,37 +1,21 @@
 ﻿@page "/chat"
 
+@attribute [Authorize]
+
+
+
 @inject NavigationManager NavigationManager
 @inject IAccessTokenProvider AccessTokenProvider
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@implements IAsyncDisposable
-@attribute [Authorize]
 @inject IState<ChatState> _chatState
-@inherits FluxorComponent
 @inject IDispatcher _dispatcher
 
-@if (IsConnected){
-<div class="form-group">
-  <label>
-    User:
-    <span>@_userName</span>
-  </label>
-</div>
-<div class="form-group">
-  <label>
-    Message:
-    <input @bind="_messageInput" size="50" />
-  </label>
-</div>
-<button class="btn btn-primary" @onclick="Send" disabled="@(!IsConnected)">Send</button>
+@implements IAsyncDisposable
+@inherits FluxorComponent
 
-<hr>
-
-<ul id="messagesList">
-  @foreach (var message in _messages)
-  {
-    <li>@message</li>
-  }
-</ul>
+@if (IsConnected)
+{
+  <Messenger OnClick="Send" UserName="@_userName" />
 }
 else
 {

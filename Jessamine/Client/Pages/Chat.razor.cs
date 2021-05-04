@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Fluxor.Blazor.Web.Components;
 using Jessamine.Client.State.Chat.Actions;
+using Jessamine.Client.State.Messenger.Actions;
+using Jessamine.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -14,7 +16,7 @@ namespace Jessamine.Client.Pages
   {
     private HubConnection _hubConnection;
     private readonly List<string> _messages = new List<string>();
-    private string _messageInput;
+
     private string _userName;
 
     protected override async Task OnInitializedAsync()
@@ -36,11 +38,9 @@ namespace Jessamine.Client.Pages
         })
         .Build();
 
-      _hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+      _hubConnection.On<Message>("ReceiveMessage", (message) =>
       {
-        var encodedMsg = $"{user}: {message}";
-        _messages.Add(encodedMsg);
-        StateHasChanged();
+        _dispatcher.Dispatch(new ReceiveMessage(message));
       });
        
       _hubConnection.On<bool, string, long>("ConnectWithUser", (isConnected, connectedUserConnectionId, conversationId) =>
@@ -66,9 +66,12 @@ namespace Jessamine.Client.Pages
       }
     }
 
-    async Task Send() =>
-      await _hubConnection.SendAsync("SendMessage", _chatState.Value.ConnectedUserId, _messageInput, _chatState.Value.ConversationId);
-
+    async Task Send(string input)
+    {
+      await _hubConnection.SendAsync("SendMessage", _chatState.Value.ConnectedUserId, input,
+        _chatState.Value.ConversationId);
+    }
+  
     public bool IsConnected => _chatState.Value.IsConnected;
 
     public async ValueTask DisposeAsync()

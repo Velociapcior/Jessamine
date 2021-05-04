@@ -18,7 +18,7 @@ namespace Jessamine.Client.State.Chat
   {
     public override string GetName() => nameof(ChatState);
 
-    protected override ChatState GetInitialState() => new ChatState
+    protected override ChatState GetInitialState() => new()
     {
       ConnectedUserId = string.Empty,
       IsConnected = false,

@@ -101,7 +101,7 @@ namespace Jessamine.Server.Hubs
 
       var conversation = await _context.Conversations.FindAsync(conversationId);
 
-      Message message = new Message
+      Message messageDto = new Message
       {
         Content = content,
         Date = DateTime.Now,
@@ -110,11 +110,21 @@ namespace Jessamine.Server.Hubs
         Conversation = conversation
       };
 
-      _context.Messages.Add(message);
+      var entityMessage = _context.Messages.Add(messageDto);
 
       await _context.SaveChangesAsync();
-      await Clients.Caller.SendAsync("ReceiveMessage", from.UserName, content);
-      await Clients.Client(connectionId).SendAsync("ReceiveMessage", from.UserName, content);
+
+      var message = new Shared.Message()
+      {
+        Content = entityMessage.Entity.Content,
+        Date = entityMessage.Entity.Date,
+        From = entityMessage.Entity.From,
+        Id = entityMessage.Entity.Id,
+        To = entityMessage.Entity.To
+      };
+
+      await Clients.Caller.SendAsync("ReceiveMessage", message);
+      await Clients.Client(connectionId).SendAsync("ReceiveMessage", message);
     }
   }
 }

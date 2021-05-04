@@ -1,0 +1,39 @@
+﻿@if (SentByUser)
+{
+  <div class="media w-50 ml-auto mb-3">
+    <div class="media-body">
+      <div class="bg-primary rounded py-2 px-3 mb-2">
+        <p class="text-small mb-0 text-white">@Content</p>
+      </div>
+      <p class="small text-muted">@Date.ToShortDateString() : @Date.ToShortTimeString()</p>
+    </div>
+  </div>
+}
+else
+{
+  <!-- Sender Message-->
+  <div class="media w-50 mb-3">
+    <img src="https://res.cloudinary.com/mhmd/image/upload/v1564960395/avatar_usae7z.svg" alt="user" width="50" class="rounded-circle">
+    <div class="media-body ml-3">
+      @From
+      <div class="bg-light rounded py-2 px-3 mb-2">
+        <p class="text-small mb-0 text-muted">@Content</p>
+      </div>
+      <p class="small text-muted">@Date.ToShortDateString() : @Date.ToShortTimeString()</p>
+    </div>
+  </div>
+}
+
+@code {
+  [Parameter]
+  public bool SentByUser { get; set; }
+
+  [Parameter]
+  public string Content { get; set; }
+
+  [Parameter]
+  public DateTime Date { get; set; }
+
+  [Parameter]
+  public string From { get; set; }
+}
