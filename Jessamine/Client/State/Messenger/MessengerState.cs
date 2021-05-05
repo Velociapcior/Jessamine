@@ -11,6 +11,8 @@ namespace Jessamine.Client.State.Messenger
   public record MessengerState
   {
     public List<Message> Messages { get; init; }
+
+    public string Input { get; init; }
   }
 
   public class MessengerFeatureState : Feature<MessengerState>
@@ -19,7 +21,8 @@ namespace Jessamine.Client.State.Messenger
 
     protected override MessengerState GetInitialState() => new()
     {
-      Messages = new List<Message>()
+      Messages = new List<Message>(),
+      Input = string.Empty
     };
   }
 }

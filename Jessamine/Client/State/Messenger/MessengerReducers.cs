@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Fluxor;
 using Jessamine.Client.State.Messenger.Actions;
+using Jessamine.Shared;
 
 namespace Jessamine.Client.State.Messenger
 {
@@ -21,6 +22,18 @@ namespace Jessamine.Client.State.Messenger
       {
         Messages = messages
       };
+    }
+
+    [ReducerMethod]
+    public static MessengerState OnInputChanged(MessengerState state, ChangeInput action)
+    {
+      return state with {Input = action.Input};
+    }
+
+    [ReducerMethod]
+    public static MessengerState OnState(MessengerState state, ClearMessenger action)
+    {
+      return state with {Messages = new List<Message>()};
     }
   }
 }

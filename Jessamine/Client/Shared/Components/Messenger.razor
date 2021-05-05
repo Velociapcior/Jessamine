@@ -1,4 +1,6 @@
 ﻿@inject IState<MessengerState> _state
+@inject IDispatcher _dispatcher
+@using Jessamine.Client.State.Messenger.Actions
 @inherits FluxorComponent
 
 <div class="px-0">
@@ -12,9 +14,9 @@
 </div>
 
 <div class="input-group">
-  <input @bind="_messageInput" type="text" placeholder="Type a message" aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light" />
+  <input  @oninput="@(OnInputChange)" value="@MessageInput"type="text" placeholder="Type a message" aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light" />
   <div class="input-group-append">
-    <button @onclick="@(()=> OnClick.InvokeAsync(_messageInput))"  id="button-addon2" class="btn btn-link"> <i class="far fa-paper-plane"></i></button>
+    <button @onclick="@(()=> OnClick.InvokeAsync(MessageInput))"  id="button-addon2" class="btn btn-link"> <i class="far fa-paper-plane"></i></button>
   </div>
 </div>
 
@@ -23,8 +25,12 @@
   public string UserName { get; set; }
 
   [Parameter] public EventCallback<string> OnClick { get; set; }
-  private string _messageInput;
+  private string MessageInput => _state.Value.Input;
 
   private List<Jessamine.Shared.Message> Messages => _state.Value.Messages;
 
+  private void OnInputChange(ChangeEventArgs args)
+  {
+    _dispatcher.Dispatch(new ChangeInput((string) args.Value));
+  } 
 }

@@ -51,6 +51,7 @@ namespace Jessamine.Client.Pages
       _hubConnection.On("EndConversation", async () =>
       {
         _dispatcher.Dispatch(new EndConversation());
+        _dispatcher.Dispatch(new ClearMessenger());
 
         await _hubConnection.SendAsync("QueueForConversation");
       });
@@ -70,6 +71,8 @@ namespace Jessamine.Client.Pages
     {
       await _hubConnection.SendAsync("SendMessage", _chatState.Value.ConnectedUserId, input,
         _chatState.Value.ConversationId);
+
+      _dispatcher.Dispatch(new ChangeInput(string.Empty));
     }
   
     public bool IsConnected => _chatState.Value.IsConnected;
@@ -77,6 +80,7 @@ namespace Jessamine.Client.Pages
     public async ValueTask DisposeAsync()
     {
       await _hubConnection.DisposeAsync();
+      _dispatcher.Dispatch(new ClearMessenger());
     }
   }
 }

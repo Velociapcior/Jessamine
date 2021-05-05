@@ -15,4 +15,18 @@ namespace Jessamine.Client.State.Messenger.Actions
       Message = message;
     }
   }
+
+  public record ClearMessenger()
+  {
+  }
+
+  public record ChangeInput
+  {
+    public string Input { get; set; }
+
+    public ChangeInput(string input)
+    {
+      Input = input;
+    }
+  }
 }
