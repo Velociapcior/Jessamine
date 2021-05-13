@@ -2,8 +2,6 @@
 
 @attribute [Authorize]
 
-
-
 @inject NavigationManager NavigationManager
 @inject IAccessTokenProvider AccessTokenProvider
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -15,6 +13,7 @@
 
 @if (IsConnected)
 {
+<div>@TimeToEnd</div>
   <Messenger OnClick="Send" UserName="@_userName" />
 }
 else

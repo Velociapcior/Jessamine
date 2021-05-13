@@ -12,6 +12,7 @@ namespace Jessamine.Client.State.Chat
     public string ConnectedUserId { get; init; }
     public bool IsConnected { get; init; }
     public long ConversationId { get; set; }
+    public TimeSpan TimeToEnd { get; set; }
   }
 
   public class ChatFeatureState : Feature<ChatState>
@@ -22,7 +23,8 @@ namespace Jessamine.Client.State.Chat
     {
       ConnectedUserId = string.Empty,
       IsConnected = false,
-      ConversationId = -1
+      ConversationId = -1,
+      TimeToEnd = TimeSpan.MinValue
     };
   }
 }

@@ -11,6 +11,8 @@ namespace Jessamine.Server.Models
 
     public long ConversationId { get; set; }
 
+    public DateTime ConversationStartDate { get; set; }
+
     public string FirstUser { get; set; }
 
     public string SecondUser { get; set; }

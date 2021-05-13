@@ -24,5 +24,11 @@ namespace Jessamine.Client.State.Chat
       ConnectedUserId = string.Empty,
       ConversationId = -1
     };
+
+    [ReducerMethod]
+    public static ChatState OnSetTImer(ChatState state, SetTimer action) => state with
+    {
+      TimeToEnd = TimeSpan.FromTicks(action.Ticks)
+    };
   }
 }

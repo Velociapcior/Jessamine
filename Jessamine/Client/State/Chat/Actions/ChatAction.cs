@@ -19,6 +19,16 @@ namespace Jessamine.Client.State.Chat.Actions
     }
   }
 
+  public record SetTimer
+  {
+    public long Ticks { get; init; }
+
+    public SetTimer(long ticks)
+    {
+      Ticks = ticks;
+    }
+  }
+
   public record EndConversation
   {
   }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Fluxor.Blazor.Web.Components;
 using Jessamine.Client.State.Chat.Actions;
@@ -15,7 +16,11 @@ namespace Jessamine.Client.Pages
   public partial class Chat
   {
     private HubConnection _hubConnection;
+
     private readonly List<string> _messages = new List<string>();
+    private Timer _timer;
+
+    private TimeSpan TimeToEnd => _chatState.Value.TimeToEnd;
 
     private string _userName;
 
@@ -46,14 +51,30 @@ namespace Jessamine.Client.Pages
       _hubConnection.On<bool, string, long>("ConnectWithUser", (isConnected, connectedUserConnectionId, conversationId) =>
       {
         _dispatcher.Dispatch(new StartConversation(connectedUserConnectionId, isConnected, conversationId));
-      });
 
+        _timer = new Timer(_ =>
+        {
+          _hubConnection.SendAsync("CalculateTimeDifference", DateTime.Now);
+        }, null, 0,1000);
+      });
+      
       _hubConnection.On("EndConversation", async () =>
       {
         _dispatcher.Dispatch(new EndConversation());
         _dispatcher.Dispatch(new ClearMessenger());
 
         await _hubConnection.SendAsync("QueueForConversation");
+      });
+
+      _hubConnection.On<long, bool>("SetTimer", (timeElapsed, timeHasRunOut) =>
+      {
+        if (timeHasRunOut)
+        {
+          _timer.Dispose();
+          return;
+        }
+
+        _dispatcher.Dispatch(new SetTimer(timeElapsed));
       });
 
       await _hubConnection.StartAsync();

@@ -35,7 +35,7 @@ namespace Jessamine.Server.Services
       }
     }
 
-    public string FindPair(string connectionId)
+    public string FindPairedUser(string connectionId)
     {
       var pair = _pairedUsers.First(x => x.FirstUser == connectionId || x.SecondUser == connectionId);
 
@@ -45,6 +45,13 @@ namespace Jessamine.Server.Services
       }
 
       return pair.FirstUser;
+    }
+
+    public Pair FindPair(string connectionId)
+    {
+      var pair = _pairedUsers.First(x => x.FirstUser == connectionId || x.SecondUser == connectionId);
+      
+      return pair;
     }
 
     public Pair GetPair(string firstParticipant, string secondParticipant)
@@ -63,11 +70,16 @@ namespace Jessamine.Server.Services
       return pair;
     }
 
-    public void SetConversation(string firstParticipant, string secondParticipant, long conversationId)
+    public void SetConversation(
+      string firstParticipant, 
+      string secondParticipant, 
+      long conversationId,
+      DateTime entityStartedDate)
     {
       Pair pair = GetPair(firstParticipant, secondParticipant);
 
       pair.ConversationId = conversationId;
+      pair.ConversationStartDate = entityStartedDate;
     }
 
     public Pair RemovePair(string connectionId)
