@@ -13,7 +13,7 @@
 
 @if (IsConnected)
 {
-<div>@TimeToEnd</div>
+<div>@TimeToEnd.ToString(@"mm\:ss")</div>
   <Messenger OnClick="Send" UserName="@_userName" />
 }
 else

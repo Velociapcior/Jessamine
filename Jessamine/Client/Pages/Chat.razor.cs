@@ -31,12 +31,17 @@ namespace Jessamine.Client.Pages
 
       _userName = user.Identity.Name;
 
+      Console.WriteLine($"ChatHub uri: {NavigationManager.BaseUri}, URI: {NavigationManager.Uri}");
+
       _hubConnection = new HubConnectionBuilder()
         .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"), options =>
         {
           options.AccessTokenProvider = async () =>
           {
             var accessTokenResult = await AccessTokenProvider.RequestAccessToken();
+
+            Console.WriteLine(accessTokenResult.Status);
+
             accessTokenResult.TryGetToken(out var accessToken);
             return accessToken.Value;
           };
