@@ -8,6 +8,7 @@ using Jessamine.Client.State.Chat.Actions;
 using Jessamine.Client.State.Messenger.Actions;
 using Jessamine.Shared;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Jessamine.Client.Pages
@@ -15,6 +16,10 @@ namespace Jessamine.Client.Pages
   [Authorize]
   public partial class Chat
   {
+    private string _modalDisplay = "none;";
+    private string _modalClass = "";
+    private bool _showBackdrop = false;
+
     private HubConnection _hubConnection;
 
     private readonly List<string> _messages = new List<string>();
@@ -23,6 +28,20 @@ namespace Jessamine.Client.Pages
     private TimeSpan TimeToEnd => _chatState.Value.TimeToEnd;
 
     private string _userName;
+
+    public void Open()
+    {
+      _modalDisplay = "block;";
+      _modalClass = "show";
+      _showBackdrop = true;
+    }
+
+    public void Close()
+    {
+      _modalDisplay = "none";
+      _modalClass = "";
+      _showBackdrop = false;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,21 +67,17 @@ namespace Jessamine.Client.Pages
         })
         .Build();
 
-      _hubConnection.On<Message>("ReceiveMessage", (message) =>
-      {
-        _dispatcher.Dispatch(new ReceiveMessage(message));
-      });
-       
-      _hubConnection.On<bool, string, long>("ConnectWithUser", (isConnected, connectedUserConnectionId, conversationId) =>
-      {
-        _dispatcher.Dispatch(new StartConversation(connectedUserConnectionId, isConnected, conversationId));
+      _hubConnection.On<Message>("ReceiveMessage", (message) => { _dispatcher.Dispatch(new ReceiveMessage(message)); });
 
-        _timer = new Timer(_ =>
+      _hubConnection.On<bool, string, long>("ConnectWithUser",
+        (isConnected, connectedUserConnectionId, conversationId) =>
         {
-          _hubConnection.SendAsync("CalculateTimeDifference", DateTime.Now);
-        }, null, 0,1000);
-      });
-      
+          _dispatcher.Dispatch(new StartConversation(connectedUserConnectionId, isConnected, conversationId));
+
+          _timer = new Timer(_ => { _hubConnection.SendAsync("CalculateTimeDifference", DateTime.Now); }, null, 0,
+            1000);
+        });
+
       _hubConnection.On("EndConversation", async () =>
       {
         _dispatcher.Dispatch(new EndConversation());
@@ -75,7 +90,10 @@ namespace Jessamine.Client.Pages
       {
         if (timeHasRunOut)
         {
-          _timer.Dispose();
+          Open();
+
+          StateHasChanged();
+
           return;
         }
 
@@ -93,7 +111,7 @@ namespace Jessamine.Client.Pages
       }
     }
 
-    async Task Send(string input)
+    private async Task Send(string input)
     {
       await _hubConnection.SendAsync("SendMessage", _chatState.Value.ConnectedUserId, input,
         _chatState.Value.ConversationId);

@@ -23,7 +23,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": "true",
-      "applicationUrl": "http://desktop-57kmtg0.home:5000/;https://desktop-57kmtg0.home:5001/",
+      "applicationUrl": "http://localhost:5000/;https://localhost:5001/",
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}"
     },
     "Watch": {
@@ -32,7 +32,7 @@
       "commandLineArgs": "watch run",
       "workingDirectory": "$(ProjectDir)",
       "launchBrowser": true,
-      "launchUrl": "http://desktop-57kmtg0.home:5000/",
+      "launchUrl": "http://localhost:5000/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

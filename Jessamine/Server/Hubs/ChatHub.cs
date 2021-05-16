@@ -16,7 +16,7 @@ namespace Jessamine.Server.Hubs
   [Authorize]
   public class ChatHub : Hub
   {
-    private readonly TimeSpan _defaultConvesationTime = TimeSpan.FromSeconds(300);
+    private readonly TimeSpan _defaultConvesationTime = TimeSpan.FromSeconds(30);
 
     private readonly IPairingProvider _pairingProvider;
     private readonly IConnectionMapping<string> _connections;

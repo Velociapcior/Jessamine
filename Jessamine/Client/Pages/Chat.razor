@@ -15,6 +15,7 @@
 {
 <div>@TimeToEnd.ToString(@"mm\:ss")</div>
   <Messenger OnClick="Send" UserName="@_userName" />
+  <EndConversationPopUp ModalClass="@_modalClass" ModalDisplay="@_modalDisplay" ShowBackdrop="@_showBackdrop" />
 }
 else
 {
