@@ -30,5 +30,17 @@ namespace Jessamine.Client.State.Chat
     {
       TimeToEnd = TimeSpan.FromTicks(action.Ticks)
     };
+
+    [ReducerMethod]
+    public static ChatState OnUserAgreedToContinueChatState(ChatState state, UserAgreedToContinue action) => state with
+    {
+      UserContinue = true
+    };
+
+    [ReducerMethod]
+    public static ChatState OnParticipantAgreedToContinueChatState(ChatState state, ParticipantAgreedToContinue action) => state with
+    {
+      ParticipantContinue = true
+    };
   }
 }

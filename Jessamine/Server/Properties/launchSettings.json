@@ -27,12 +27,14 @@
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}"
     },
     "Watch": {
-      "commandName": "Project",
+      "commandName": "Executable",
       "executablePath": "dotnet.exe",
       "commandLineArgs": "watch run",
       "workingDirectory": "$(ProjectDir)",
       "launchBrowser": true,
       "launchUrl": "http://localhost:5000/",
+      "applicationUrl": "http://localhost:5000/;https://localhost:5001/",
+      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

@@ -1,8 +1,9 @@
-﻿@page "/conversations/{conversationId?}"
+﻿@page "/conversations/{ConversationId:long}"
 
 <h3>Conversations</h3>
+<span>@ConversationId</span>
 
 @code {
   [Parameter]
-  public Guid ConversationId { get; set; }
+  public long ConversationId { get; set; }
 }

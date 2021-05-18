@@ -15,7 +15,40 @@
 {
 <div>@TimeToEnd.ToString(@"mm\:ss")</div>
   <Messenger OnClick="Send" UserName="@_userName" />
-  <EndConversationPopUp ModalClass="@_modalClass" ModalDisplay="@_modalDisplay" ShowBackdrop="@_showBackdrop" />
+  <EndConversationPopUp ModalClass="@_modalClass" ModalDisplay="@_modalDisplay" ShowBackdrop="@_showBackdrop">
+    <Title>
+      Time to decide!
+    </Title>
+    <Body>
+      @if (_chatState.Value.UserContinue)
+      {
+        <div>You agreed to continue, now we need to wait for another user</div>
+      }
+      else
+      {
+        <div>Do you want to continue conversation?</div>
+      }
+      @if (_chatState.Value.ParticipantContinue)
+      {
+        <div>Other person wants to talk with you more, now it's your move</div>
+      }
+    </Body>
+    <Footer>
+      <button type="button" @onclick="() => { OnAgreeClick(); }" class="btn btn-success btn-lg btn-block" disabled=@_chatState.Value.UserContinue>
+        @if (_chatState.Value.UserContinue)
+        {
+          <span class="spinner-grow spinner-grow" role="status" aria-hidden="true"></span>
+          <span>Waiting...</span>
+        }
+        else
+        {
+        <span>Yes</span>
+        }
+      </button>
+      <br/>
+      <button type="button" class="btn btn-danger btn-lg btn-block">No</button>
+    </Footer>
+  </EndConversationPopUp>
 }
 else
 {

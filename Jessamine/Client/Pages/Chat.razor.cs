@@ -29,6 +29,8 @@ namespace Jessamine.Client.Pages
 
     private string _userName;
 
+    public bool IsConnected => _chatState.Value.IsConnected;
+
     public void Open()
     {
       _modalDisplay = "block;";
@@ -43,6 +45,24 @@ namespace Jessamine.Client.Pages
       _showBackdrop = false;
     }
 
+    public async Task OnAgreeClick()
+    {
+      _dispatcher.Dispatch(new UserAgreedToContinue());
+
+      await _hubConnection.SendAsync("ParticipantAgreedToContinue", _chatState.Value.ConnectedUserId);
+
+      if (_chatState.Value.UserContinue && _chatState.Value.ParticipantContinue)
+      {
+        _dispatcher.Dispatch(new EndConversation());
+        GoToConversation();
+      }
+    }
+
+    public void GoToConversation()
+    {
+      NavigationManager.NavigateTo($"conversations/{_chatState.Value.ConversationId}");
+    }
+
     protected override async Task OnInitializedAsync()
     {
       var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -52,6 +72,10 @@ namespace Jessamine.Client.Pages
 
       Console.WriteLine($"ChatHub uri: {NavigationManager.BaseUri}, URI: {NavigationManager.Uri}");
 
+      await CreateHubConnection();
+    }
+    private async Task CreateHubConnection()
+    {
       _hubConnection = new HubConnectionBuilder()
         .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"), options =>
         {
@@ -59,14 +83,19 @@ namespace Jessamine.Client.Pages
           {
             var accessTokenResult = await AccessTokenProvider.RequestAccessToken();
 
-            Console.WriteLine(accessTokenResult.Status);
-
             accessTokenResult.TryGetToken(out var accessToken);
             return accessToken.Value;
           };
         })
         .Build();
 
+      ConfigureHubConnection();
+
+      await _hubConnection.StartAsync();
+    }
+
+    private void ConfigureHubConnection()
+    {
       _hubConnection.On<Message>("ReceiveMessage", (message) => { _dispatcher.Dispatch(new ReceiveMessage(message)); });
 
       _hubConnection.On<bool, string, long>("ConnectWithUser",
@@ -100,7 +129,16 @@ namespace Jessamine.Client.Pages
         _dispatcher.Dispatch(new SetTimer(timeElapsed));
       });
 
-      await _hubConnection.StartAsync();
+      _hubConnection.On("ParticipantAgreedToContinue", () =>
+      {
+        _dispatcher.Dispatch(new ParticipantAgreedToContinue());
+
+        if (_chatState.Value.UserContinue && _chatState.Value.ParticipantContinue)
+        {
+          _dispatcher.Dispatch(new EndConversation());
+          GoToConversation();
+        }
+      });
     }
 
     protected override async void OnAfterRender(bool firstRender)
@@ -118,8 +156,6 @@ namespace Jessamine.Client.Pages
 
       _dispatcher.Dispatch(new ChangeInput(string.Empty));
     }
-  
-    public bool IsConnected => _chatState.Value.IsConnected;
 
     public async ValueTask DisposeAsync()
     {

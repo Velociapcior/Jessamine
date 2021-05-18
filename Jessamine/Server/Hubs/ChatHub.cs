@@ -8,8 +8,10 @@ using Jessamine.Server.Data;
 using Jessamine.Server.Models;
 using Jessamine.Server.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Jessamine.Server.Hubs
 {
@@ -139,6 +141,11 @@ namespace Jessamine.Server.Hubs
 
       await Clients.Caller.SendAsync("ReceiveMessage", message);
       await Clients.Client(connectionId).SendAsync("ReceiveMessage", message);
+    }
+
+    public async Task ParticipantAgreedToContinue(string connectedUserId)
+    {
+      await Clients.Clients(connectedUserId).SendAsync("ParticipantAgreedToContinue");
     }
   }
 }
