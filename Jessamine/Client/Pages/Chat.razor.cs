@@ -114,11 +114,11 @@ namespace Jessamine.Client.Pages
 
       _hubConnection.On("EndConversation", async () =>
       {
+        await _timer.DisposeAsync();
         _dispatcher.Dispatch(new EndConversation());
         _dispatcher.Dispatch(new ClearMessenger());
 
         Close();
-
         await _hubConnection.SendAsync("QueueForConversation");
       });
 

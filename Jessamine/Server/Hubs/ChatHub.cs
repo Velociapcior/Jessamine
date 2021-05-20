@@ -116,7 +116,7 @@ namespace Jessamine.Server.Hubs
       TimeSpan elapsedTime = curerntTime - pair.ConversationStartDate;
 
       var timeLeft = _defaultConvesationTime - elapsedTime;
-      
+
       await Clients.Clients(Context.ConnectionId).SendAsync("SetTimer", timeLeft.Ticks, elapsedTime > _defaultConvesationTime);
     }
 
