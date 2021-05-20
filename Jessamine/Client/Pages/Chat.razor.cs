@@ -45,6 +45,11 @@ namespace Jessamine.Client.Pages
       _showBackdrop = false;
     }
 
+    public async Task OnDeclineClick()
+    {
+      await _hubConnection.SendAsync("EndConversation", _chatState.Value.ConversationId);
+    }
+
     public async Task OnAgreeClick()
     {
       _dispatcher.Dispatch(new UserAgreedToContinue());
@@ -112,6 +117,8 @@ namespace Jessamine.Client.Pages
         _dispatcher.Dispatch(new EndConversation());
         _dispatcher.Dispatch(new ClearMessenger());
 
+        Close();
+
         await _hubConnection.SendAsync("QueueForConversation");
       });
 
@@ -122,6 +129,8 @@ namespace Jessamine.Client.Pages
           Open();
 
           StateHasChanged();
+
+          _timer.DisposeAsync();
 
           return;
         }
@@ -160,6 +169,9 @@ namespace Jessamine.Client.Pages
     public async ValueTask DisposeAsync()
     {
       await _hubConnection.DisposeAsync();
+
+      await _timer.DisposeAsync();
+
       _dispatcher.Dispatch(new ClearMessenger());
     }
   }

@@ -34,7 +34,7 @@
       }
     </Body>
     <Footer>
-      <button type="button" @onclick="() => { OnAgreeClick(); }" class="btn btn-success btn-lg btn-block" disabled=@_chatState.Value.UserContinue>
+      <button type="button" @onclick="async () => { await OnAgreeClick(); }" class="btn btn-success btn-lg btn-block" disabled=@_chatState.Value.UserContinue>
         @if (_chatState.Value.UserContinue)
         {
           <span class="spinner-grow spinner-grow" role="status" aria-hidden="true"></span>
@@ -46,7 +46,7 @@
         }
       </button>
       <br/>
-      <button type="button" class="btn btn-danger btn-lg btn-block">No</button>
+      <button type="button" @onclick="async () => { await OnDeclineClick(); }" class="btn btn-danger btn-lg btn-block">No</button>
     </Footer>
   </EndConversationPopUp>
 }

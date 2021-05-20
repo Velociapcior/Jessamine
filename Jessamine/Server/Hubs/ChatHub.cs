@@ -74,6 +74,16 @@ namespace Jessamine.Server.Hubs
       }
     }
 
+    public async Task EndConversation(long conversationId)
+    {
+      var pair = _pairingProvider.RemovePair(Context.ConnectionId);
+
+      if (pair != null)
+      {
+        await Clients.Clients(new[] { pair.FirstUser, pair.SecondUser }).SendAsync("EndConversation");
+      }
+    }
+
     public override Task OnDisconnectedAsync(Exception? exception)
     {
       var pair = _pairingProvider.RemovePair(Context.ConnectionId);

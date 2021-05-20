@@ -22,5 +22,7 @@ namespace Jessamine.Server.Services.Interfaces
       DateTime startedDate);
 
     Pair RemovePair(string connectionId);
+
+    Pair RemovePair(long conversationId);
   }
 }

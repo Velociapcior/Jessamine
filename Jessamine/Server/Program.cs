@@ -11,17 +11,23 @@ namespace Jessamine.Server
 {
   public class Program
   {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
+      await DebugDelayAsync();
+
       CreateHostBuilder(args).Build().Run();
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
+      Host.CreateDefaultBuilder(args)
 
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-              webBuilder.UseStartup<Startup>();
-            });
+        .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+
+    private static async Task DebugDelayAsync()
+    {
+#if DEBUG
+      await Task.Delay(5000);
+#endif
+    }
   }
 }
