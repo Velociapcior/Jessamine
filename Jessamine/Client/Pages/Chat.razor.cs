@@ -170,8 +170,12 @@ namespace Jessamine.Client.Pages
     {
       await _hubConnection.DisposeAsync();
 
-      await _timer.DisposeAsync();
-
+      if (_timer != null)
+      {
+        await _timer.DisposeAsync();
+      }
+      
+      _dispatcher.Dispatch(new EndConversation());
       _dispatcher.Dispatch(new ClearMessenger());
     }
   }
