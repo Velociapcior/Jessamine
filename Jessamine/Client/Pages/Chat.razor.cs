@@ -58,7 +58,10 @@ namespace Jessamine.Client.Pages
 
       if (_chatState.Value.UserContinue && _chatState.Value.ParticipantContinue)
       {
+        await _hubConnection.SendAsync("AcceptConversation", _chatState.Value.ConversationId);
+
         _dispatcher.Dispatch(new EndConversation());
+        
         GoToConversation();
       }
     }
@@ -138,12 +141,14 @@ namespace Jessamine.Client.Pages
         _dispatcher.Dispatch(new SetTimer(timeElapsed));
       });
 
-      _hubConnection.On("ParticipantAgreedToContinue", () =>
+      _hubConnection.On("ParticipantAgreedToContinue", async () =>
       {
         _dispatcher.Dispatch(new ParticipantAgreedToContinue());
 
         if (_chatState.Value.UserContinue && _chatState.Value.ParticipantContinue)
         {
+          await _hubConnection.SendAsync("AcceptConversation", _chatState.Value.ConversationId);
+
           _dispatcher.Dispatch(new EndConversation());
           GoToConversation();
         }

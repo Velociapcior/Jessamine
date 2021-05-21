@@ -74,9 +74,24 @@ namespace Jessamine.Server.Hubs
       }
     }
 
+    public async Task AcceptConversation(long conversationId)
+    {
+      var conversation = await _context.Conversations.FindAsync();
+
+      conversation.Accepted = true;
+
+      await _context.SaveChangesAsync();
+    }
+
     public async Task EndConversation(long conversationId)
     {
       var pair = _pairingProvider.RemovePair(Context.ConnectionId);
+
+      var conversation = await _context.Conversations.FindAsync(conversationId);
+
+      conversation.Accepted = false;
+
+      await _context.SaveChangesAsync();
 
       if (pair != null)
       {

@@ -13,6 +13,8 @@ namespace Jessamine.Server.Models
 
     public virtual ICollection<Message> Messages { get; set; }
 
+    public bool Accepted { get; set; }
+
     public DateTime StartedDate { get; set; }
   }
 }

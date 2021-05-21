@@ -1,9 +1,4 @@
-﻿@page "/conversations/{ConversationId:long}"
+﻿@page "/conversations/{ConversationId:long?}"
 
 <h3>Conversations</h3>
 <span>@ConversationId</span>
-
-@code {
-  [Parameter]
-  public long ConversationId { get; set; }
-}
