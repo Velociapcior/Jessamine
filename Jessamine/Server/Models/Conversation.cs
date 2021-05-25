@@ -16,5 +16,11 @@ namespace Jessamine.Server.Models
     public bool Accepted { get; set; }
 
     public DateTime StartedDate { get; set; }
+
+    public string LastMessage { get; set; }
+
+    public DateTime LastMessageDate { get; set; }
+
+    public bool LastMessageRead { get; set; }
   }
 }

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Jessamine.Server.Hubs
@@ -150,6 +151,10 @@ namespace Jessamine.Server.Hubs
         To = to.UserName,
         Conversation = conversation
       };
+
+      conversation.LastMessage = content;
+      conversation.LastMessageDate = messageDto.Date;
+      conversation.LastMessageRead = true;
 
       var entityMessage = _context.Messages.Add(messageDto);
 
