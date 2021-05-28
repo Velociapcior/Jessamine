@@ -29,11 +29,9 @@ namespace Jessamine.Client.State.Chat.Actions
     }
   }
 
-  public record EndConversation
-  {
-  }
+  public record EndConversation;
 
-  public record UserAgreedToContinue();
+  public record UserAgreedToContinue;
 
-  public record ParticipantAgreedToContinue();
+  public record ParticipantAgreedToContinue;
 }

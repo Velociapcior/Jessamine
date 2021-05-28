@@ -6,13 +6,16 @@ using System.Threading.Tasks;
 using IdentityServer4.Stores;
 using Jessamine.Server.Data;
 using Jessamine.Server.Models;
+using Jessamine.Server.Services.Converters.Interfaces;
 using Jessamine.Server.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Logging;
 
 namespace Jessamine.Server.Hubs
 {
@@ -23,19 +26,26 @@ namespace Jessamine.Server.Hubs
 
     private readonly IPairingProvider _pairingProvider;
     private readonly IConnectionMapping<string> _connections;
+    private readonly IMessageConverter _messageConverter;
+    private readonly ILogger<ChatHub> _logger;
 
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ApplicationDbContext _context;
 
-    public ChatHub(IPairingProvider pairingProvider,
+    public ChatHub(
+      IPairingProvider pairingProvider,
       IConnectionMapping<string> connections,
       UserManager<ApplicationUser> userManager,
-      ApplicationDbContext context)
+      ApplicationDbContext context, 
+      IMessageConverter messageConverter, 
+      ILogger<ChatHub> logger)
     {
       _pairingProvider = pairingProvider;
       _connections = connections;
       _userManager = userManager;
       _context = context;
+      _messageConverter = messageConverter;
+      _logger = logger;
     }
 
     public async Task QueueForConversation()
@@ -71,6 +81,7 @@ namespace Jessamine.Server.Hubs
       }
       catch (Exception e)
       {
+        _logger.LogCritical(e, $"Failed to connect user: {Context.UserIdentifier} with another user");
         throw;
       }
     }
@@ -154,20 +165,13 @@ namespace Jessamine.Server.Hubs
 
       conversation.LastMessage = content;
       conversation.LastMessageDate = messageDto.Date;
-      conversation.LastMessageRead = true;
+      conversation.LastMessageStatus = 3;
 
       var entityMessage = _context.Messages.Add(messageDto);
 
       await _context.SaveChangesAsync();
 
-      var message = new Shared.Message()
-      {
-        Content = entityMessage.Entity.Content,
-        Date = entityMessage.Entity.Date,
-        From = entityMessage.Entity.From,
-        Id = entityMessage.Entity.Id,
-        To = entityMessage.Entity.To
-      };
+      var message = _messageConverter.Map(entityMessage.Entity);
 
       await Clients.Caller.SendAsync("ReceiveMessage", message);
       await Clients.Client(connectionId).SendAsync("ReceiveMessage", message);

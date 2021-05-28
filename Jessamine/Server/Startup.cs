@@ -16,9 +16,11 @@ using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Jessamine.Server.Hubs;
+using Jessamine.Server.Infrastructure.DependencyInjection;
 using Jessamine.Server.Services;
 using Jessamine.Server.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Serilog;
 
 namespace Jessamine.Server
 {
@@ -74,6 +76,8 @@ namespace Jessamine.Server
       services.AddSingleton<IPairingProvider, PairingProvider>();
       services.AddTransient<IProfileService, ProfileService>();
 
+      ServicesInstaller.Install(services);
+
       services.Configure<IdentityOptions>(options =>
       {
         options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
@@ -84,7 +88,7 @@ namespace Jessamine.Server
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
       app.UseResponseCompression();
-
+      app.UseSerilogRequestLogging();
       if (env.IsDevelopment())
       {
         app.UseDeveloperExceptionPage();

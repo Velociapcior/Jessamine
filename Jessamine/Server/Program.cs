@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System;
+using System.Linq;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
+using Serilog.Events;
 
 namespace Jessamine.Server
 {
@@ -13,14 +13,39 @@ namespace Jessamine.Server
   {
     public static async Task Main(string[] args)
     {
-      await DebugDelayAsync();
+      Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Debug()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+        .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+        .MinimumLevel.Override("System", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Information)
+        .Filter.ByExcluding(c => c.Properties.Any(p => p.Value.ToString().Contains("_framework")))
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .CreateLogger();
 
-      CreateHostBuilder(args).Build().Run();
+
+      try
+      {
+        Log.Information("Starting up");
+
+        await DebugDelayAsync();
+        CreateHostBuilder(args).Build().Run();
+      }
+      catch (Exception ex)
+      {
+        Log.Fatal(ex, "Application start-up failed");
+      }
+      finally
+      {
+        Log.CloseAndFlush();
+      }
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
       Host.CreateDefaultBuilder(args)
-
+        .UseSerilog()
         .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
 
     private static async Task DebugDelayAsync()
