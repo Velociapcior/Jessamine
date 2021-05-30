@@ -32,8 +32,16 @@ namespace Jessamine.Client
         config.ScanAssemblies(typeof(Program).Assembly);
         config.UseReduxDevTools();
       });
-
+      
+      await DebugDelayAsync();
       await builder.Build().RunAsync();
+    }
+
+    private static async Task DebugDelayAsync()
+    {
+#if DEBUG
+      await Task.Delay(5000);
+#endif
     }
   }
 }

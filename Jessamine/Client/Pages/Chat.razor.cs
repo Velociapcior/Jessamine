@@ -54,6 +54,8 @@ namespace Jessamine.Client.Pages
     {
       _dispatcher.Dispatch(new UserAgreedToContinue());
 
+      var conversationId = _chatState.Value.ConversationId;
+
       await _hubConnection.SendAsync("ParticipantAgreedToContinue", _chatState.Value.ConnectedUserId);
 
       if (_chatState.Value.UserContinue && _chatState.Value.ParticipantContinue)
@@ -62,13 +64,13 @@ namespace Jessamine.Client.Pages
 
         _dispatcher.Dispatch(new EndConversation());
         
-        GoToConversation();
+        GoToConversation(conversationId);
       }
     }
 
-    public void GoToConversation()
+    public void GoToConversation(long conversationId)
     {
-      NavigationManager.NavigateTo($"conversations/{_chatState.Value.ConversationId}");
+      NavigationManager.NavigateTo($"conversations/{conversationId}");
     }
 
     protected override async Task OnInitializedAsync()
@@ -79,13 +81,12 @@ namespace Jessamine.Client.Pages
       _userName = user.Identity.Name;
 
       Console.WriteLine($"ChatHub uri: {NavigationManager.BaseUri}, URI: {NavigationManager.Uri}");
-
-      await CreateHubConnection();
     }
+
     private async Task CreateHubConnection()
     {
       _hubConnection = new HubConnectionBuilder()
-        .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"), options =>
+        .WithUrl(NavigationManager.ToAbsoluteUri("/hubs/chathub"), options =>
         {
           options.AccessTokenProvider = async () =>
           {
@@ -145,21 +146,35 @@ namespace Jessamine.Client.Pages
       {
         _dispatcher.Dispatch(new ParticipantAgreedToContinue());
 
+        long conversationId = _chatState.Value.ConversationId;
+
         if (_chatState.Value.UserContinue && _chatState.Value.ParticipantContinue)
         {
-          await _hubConnection.SendAsync("AcceptConversation", _chatState.Value.ConversationId);
+          await _hubConnection.SendAsync("AcceptConversation", conversationId);
 
           _dispatcher.Dispatch(new EndConversation());
-          GoToConversation();
+          GoToConversation(conversationId);
         }
       });
     }
 
-    protected override async void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
       if (firstRender)
       {
-        await _hubConnection.SendAsync("QueueForConversation");
+        try
+        {
+          await CreateHubConnection();
+
+          await _hubConnection.SendAsync("QueueForConversation");
+        }
+        catch (NullReferenceException e)
+        {
+          Console.WriteLine("Error when queue'ing for conversation");
+          Console.WriteLine(e.Message);
+          throw;
+        }
+
       }
     }
 

@@ -88,7 +88,7 @@ namespace Jessamine.Server.Hubs
 
     public async Task AcceptConversation(long conversationId)
     {
-      var conversation = await _context.Conversations.FindAsync();
+      var conversation = await _context.Conversations.FindAsync(conversationId);
 
       conversation.Accepted = true;
 

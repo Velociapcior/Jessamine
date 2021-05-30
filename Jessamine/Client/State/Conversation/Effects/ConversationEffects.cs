@@ -20,11 +20,20 @@ namespace Jessamine.Client.State.Conversation.Effects
     }
 
     [EffectMethod]
-    public async Task LoadConversations(FetchConversations actionConversations, IDispatcher dispatcher)
+    public async Task LoadConversations(FetchConversations action, IDispatcher dispatcher)
     {
-      var conversations = await Http.GetFromJsonAsync<List<Jessamine.Shared.Conversation>>("api/conversations");
+      Console.WriteLine("Conversation effect");
 
+      List<Jessamine.Shared.Conversation> conversations = await Http.GetFromJsonAsync<List<Jessamine.Shared.Conversation>>("api/conversations");
+      
       dispatcher.Dispatch(new SaveConversations(conversations));
+
+      if (conversations is {Count: > 0})
+      {
+        long selectedConversationId = action.ConversationId ?? conversations.First().Id;
+
+        dispatcher.Dispatch(new SetSelectedConversation(selectedConversationId));
+      }
     }
   }
 }

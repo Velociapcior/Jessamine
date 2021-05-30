@@ -6,6 +6,8 @@ namespace Jessamine.Client.State.Conversation
   public record ConversationState
   {
     public List<Jessamine.Shared.Conversation> Conversations { get; init; }
+
+    public long SelectedConversationId { get; set; }
   }
 
   public class ConversationFeatureState : Feature<ConversationState>
@@ -14,7 +16,8 @@ namespace Jessamine.Client.State.Conversation
 
     protected override ConversationState GetInitialState() => new()
     {
-      Conversations = new List<Jessamine.Shared.Conversation>()
+      Conversations = new List<Jessamine.Shared.Conversation>(),
+      SelectedConversationId = default
     };
   }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Jessamine.Client.State.Conversation.Actions
 {
-  public record FetchConversations;
+  public record FetchConversations(long? ConversationId);
 
   public record SaveConversations
   {
@@ -16,4 +16,6 @@ namespace Jessamine.Client.State.Conversation.Actions
       Conversations = conversations;
     }
   }
+
+  public record SetSelectedConversation(long ConversationId);
 }

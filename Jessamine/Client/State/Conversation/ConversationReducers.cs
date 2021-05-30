@@ -14,5 +14,14 @@ namespace Jessamine.Client.State.Conversation
     {
       Conversations = action.Conversations
     };
+
+    [ReducerMethod]
+    public static ConversationState OnSetSelectedConversation(
+      ConversationState state,
+      SetSelectedConversation action) => 
+      state with
+    {
+      SelectedConversationId = action.ConversationId
+    };
   }
 }

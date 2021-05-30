@@ -11,15 +11,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Fluxor.DependencyInjection;
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Jessamine.Server.Hubs;
+using Jessamine.Server.Infrastructure.Authorization;
 using Jessamine.Server.Infrastructure.DependencyInjection;
 using Jessamine.Server.Services;
 using Jessamine.Server.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace Jessamine.Server
@@ -61,7 +66,11 @@ namespace Jessamine.Server
           });
 
       services.AddAuthentication()
-          .AddIdentityServerJwt();
+        .AddIdentityServerJwt();
+
+      services.TryAddEnumerable(
+        ServiceDescriptor.Singleton<IPostConfigureOptions<JwtBearerOptions>,
+          ConfigureJwtBearerOptions>());
 
       services.AddControllersWithViews();
       services.AddRazorPages();
@@ -116,7 +125,7 @@ namespace Jessamine.Server
       {
         endpoints.MapRazorPages();
         endpoints.MapControllers();
-        endpoints.MapHub<ChatHub>("/chathub");
+        endpoints.MapHub<ChatHub>("/hubs/chathub");
         endpoints.MapFallbackToFile("index.html");
       });
     }

@@ -10,6 +10,7 @@ using Jessamine.Server.Services.Converters.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Jessamine.Server.Controllers
 {
@@ -22,32 +23,50 @@ namespace Jessamine.Server.Controllers
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ApplicationDbContext _context;
     private readonly IConversationConverter _conversationConverter;
+    private readonly ILogger<ConversationsController> _logger;
 
     public ConversationsController(
       ApplicationDbContext context,
       UserManager<ApplicationUser> userManager,
-      IConversationConverter conversationConverter)
+      IConversationConverter conversationConverter,
+      ILogger<ConversationsController> logger)
     {
       _context = context;
       _userManager = userManager;
       _conversationConverter = conversationConverter;
+      _logger = logger;
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IEnumerable<Shared.Conversation>> Get()
     {
-      ApplicationUser user = await _userManager.GetUserAsync(User);
+      try
+      {
+        ApplicationUser user = await _userManager.GetUserAsync(User);
 
-      var conversationEntities = _context
-        .Conversations
-        .Where(c => c.Participants.Contains(user) && c.Accepted)
-        .OrderByDescending(x => x.LastMessageDate);
+        var conversationEntities = _context
+          .Conversations
+          .Where(c => c.Participants.Contains(user) && c.Accepted)
+          .Include(x => x.Participants)
+          .OrderByDescending(x => x.LastMessageDate);
 
 
-      var conversations =
-        conversationEntities.Select(x => _conversationConverter.Map(x, x.Participants.Single(y => y.Id != user.Id).UserName));
+        var conversations =
+          conversationEntities
+            .Select(x => 
+              _conversationConverter.Map(
+                x, 
+                x.Participants
+                .Single(y =>
+                  y.Id != user.Id).UserName));
 
-      return new JsonResult(conversations);
+        return conversations;
+      }
+      catch (Exception ex)
+      {
+        _logger.LogCritical(ex, $"Error while getting conversation list, user {HttpContext.User.Identity?.Name}");
+        throw;
+      }
     }
   }
 }
