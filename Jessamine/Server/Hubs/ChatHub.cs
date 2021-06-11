@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using IdentityServer4.Stores;
 using Jessamine.Server.Data;
@@ -22,7 +23,7 @@ namespace Jessamine.Server.Hubs
   [Authorize]
   public class ChatHub : Hub
   {
-    private readonly TimeSpan _defaultConvesationTime = TimeSpan.FromSeconds(30);
+    private readonly TimeSpan _defaultConvesationTime = TimeSpan.FromSeconds(3000);
 
     private readonly IPairingProvider _pairingProvider;
     private readonly IConnectionMapping<string> _connections;
@@ -60,8 +61,11 @@ namespace Jessamine.Server.Hubs
 
           var participants = new List<ApplicationUser>();
 
-          participants.Add(_userManager.Users.First(x => x.Id == Context.UserIdentifier));
-          participants.Add(_userManager.Users.First(x => x.Id == _connections.GetUser(pairedUserConnectionId)));
+          var currentUser = await _userManager.GetUserAsync(Context.User);
+          var pairedUser = await _userManager.FindByIdAsync(_connections.GetUser(pairedUserConnectionId));
+
+          participants.Add(currentUser);
+          participants.Add(pairedUser);
 
           var conversation = _context.Conversations.Add(new Conversation
           {
@@ -74,9 +78,9 @@ namespace Jessamine.Server.Hubs
 
           _pairingProvider.SetConversation(Context.ConnectionId, pairedUserConnectionId, conversation.Entity.Id, conversation.Entity.StartedDate);
 
-          await Clients.Client(pairedUserConnectionId).SendAsync("ConnectWithUser", true, Context.ConnectionId, conversation.Entity.Id);
+          await Clients.Client(pairedUserConnectionId).SendAsync("ConnectWithUser", true, Context.ConnectionId, conversation.Entity.Id, currentUser.UserName);
 
-          await Clients.Client(Context.ConnectionId).SendAsync("ConnectWithUser", true, pairedUserConnectionId, conversation.Entity.Id);
+          await Clients.Client(Context.ConnectionId).SendAsync("ConnectWithUser", true, pairedUserConnectionId, conversation.Entity.Id, pairedUser.UserName);
         }
       }
       catch (Exception e)

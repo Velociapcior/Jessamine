@@ -21,7 +21,8 @@ namespace Jessamine.Client.State.Conversation
       SetSelectedConversation action) => 
       state with
     {
-      SelectedConversationId = action.ConversationId
+      SelectedConversationId = action.ConversationId,
+      SelectedConversation = state.Conversations.FirstOrDefault(x => x.Id == action.ConversationId)
     };
   }
 }

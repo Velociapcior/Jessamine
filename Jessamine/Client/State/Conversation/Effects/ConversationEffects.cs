@@ -22,8 +22,6 @@ namespace Jessamine.Client.State.Conversation.Effects
     [EffectMethod]
     public async Task LoadConversations(FetchConversations action, IDispatcher dispatcher)
     {
-      Console.WriteLine("Conversation effect");
-
       List<Jessamine.Shared.Conversation> conversations = await Http.GetFromJsonAsync<List<Jessamine.Shared.Conversation>>("api/conversations");
       
       dispatcher.Dispatch(new SaveConversations(conversations));

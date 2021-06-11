@@ -3,18 +3,26 @@
 
 @inject NavigationManager Navigation
 @inject SignOutSessionStateManager SignOutManager
-
+<ul class="nav">
 <AuthorizeView>
     <Authorized>
-        <a href="authentication/profile">Hello, @context.User.Identity.Name!</a>
-        <button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>
+      <li class="nav-item">
+        <a class="nav-link active" href="authentication/profile">Hello, @context.User.Identity.Name!</a>
+      </li>
+      <li class="nav-item">
+        <button class="btn btn-primary" @onclick="BeginSignOut">Log out</button>
+      </li>
     </Authorized>
     <NotAuthorized>
-        <a href="authentication/register">Register</a>
-        <a href="authentication/login">Log in</a>
+      <li class="nav-item">
+        <a class="nav-link" href="authentication/register">Register</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="authentication/login">Log in</a>
+      </li>
     </NotAuthorized>
 </AuthorizeView>
-
+</ul>
 @code{
     private async Task BeginSignOut(MouseEventArgs args)
     {

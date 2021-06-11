@@ -13,8 +13,10 @@
 
 @if (IsConnected)
 {
-<div>@TimeToEnd.ToString(@"mm\:ss")</div>
-  <Messenger OnClick="Send" UserName="@_userName" />
+  <div>@TimeToEnd.ToString(@"mm\:ss")</div>
+  
+  <Messenger OnClick="Send" UserName="@_userName" ParticipantName="@_chatState.Value.ConnectedUserName" />
+  
   <EndConversationPopUp ModalClass="@_modalClass" ModalDisplay="@_modalDisplay" ShowBackdrop="@_showBackdrop">
     <Title>
       Time to decide!
@@ -42,10 +44,10 @@
         }
         else
         {
-        <span>Yes</span>
+          <span>Yes</span>
         }
       </button>
-      <br/>
+      <br />
       <button type="button" @onclick="async () => { await OnDeclineClick(); }" class="btn btn-danger btn-lg btn-block">No</button>
     </Footer>
   </EndConversationPopUp>

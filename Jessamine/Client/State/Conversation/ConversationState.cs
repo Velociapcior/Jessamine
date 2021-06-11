@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
 using Fluxor;
+using ConversationModel = Jessamine.Shared.Conversation;
 
 namespace Jessamine.Client.State.Conversation
 {
   public record ConversationState
   {
-    public List<Jessamine.Shared.Conversation> Conversations { get; init; }
+    public List<ConversationModel> Conversations { get; init; }
 
-    public long SelectedConversationId { get; set; }
+    public long SelectedConversationId { get; init; }
+
+    public ConversationModel SelectedConversation { get; init; }
   }
 
   public class ConversationFeatureState : Feature<ConversationState>
@@ -16,8 +19,9 @@ namespace Jessamine.Client.State.Conversation
 
     protected override ConversationState GetInitialState() => new()
     {
-      Conversations = new List<Jessamine.Shared.Conversation>(),
-      SelectedConversationId = default
+      Conversations = new List<ConversationModel>(),
+      SelectedConversationId = default,
+      SelectedConversation = new ConversationModel()
     };
   }
 }

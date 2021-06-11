@@ -5,13 +5,14 @@
 @attribute [Authorize]
 @inject IState<ConversationState> _conversationState
 @inject IDispatcher _dispatcher
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @inherits FluxorComponent
 
 <h3>Conversations</h3>
 <span>@ConversationId</span>
 
-<div class="row rounded-lg overflow-hidden shadow">
+<div class="row rounded-lg shadow">
   <!-- Users box-->
   <div class="col-5 px-0">
     <div class="bg-white">
@@ -57,4 +58,8 @@
       </div>
     </div>
   </div>
+  <div class="col-7 px-0">
+    <Messenger OnClick="Send" UserName="@_userName" ParticipantName="@_conversationState.Value.SelectedConversation.ParticipantName" />
+  </div>
 </div>
+

@@ -22,7 +22,6 @@ namespace Jessamine.Client.Pages
 
     private HubConnection _hubConnection;
 
-    private readonly List<string> _messages = new List<string>();
     private Timer _timer;
 
     private TimeSpan TimeToEnd => _chatState.Value.TimeToEnd;
@@ -107,10 +106,10 @@ namespace Jessamine.Client.Pages
     {
       _hubConnection.On<Message>("ReceiveMessage", (message) => { _dispatcher.Dispatch(new ReceiveMessage(message)); });
 
-      _hubConnection.On<bool, string, long>("ConnectWithUser",
-        (isConnected, connectedUserConnectionId, conversationId) =>
+      _hubConnection.On<bool, string, long, string>("ConnectWithUser",
+        (isConnected, connectedUserConnectionId, conversationId, connectedUserName) =>
         {
-          _dispatcher.Dispatch(new StartConversation(connectedUserConnectionId, isConnected, conversationId));
+          _dispatcher.Dispatch(new StartConversation(connectedUserConnectionId, isConnected, conversationId, connectedUserName));
 
           _timer = new Timer(_ => { _hubConnection.SendAsync("CalculateTimeDifference", DateTime.Now); }, null, 0,
             1000);

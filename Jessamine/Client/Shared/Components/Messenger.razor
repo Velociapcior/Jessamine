@@ -1,28 +1,33 @@
 ﻿@inject IState<MessengerState> _state
 @inject IDispatcher _dispatcher
 @using Jessamine.Client.State.Messenger.Actions
+@using System.ComponentModel.DataAnnotations
 @inherits FluxorComponent
 
-<div class="px-0">
-  <div class="px-4 py-5 chat-box bg-white">
-    @foreach (Jessamine.Shared.Message msg in Messages)
-    {
-      <Message SentByUser="@(UserName==msg.From)" From="@msg.From"  Content="@msg.Content" Date="msg.Date" />
-    }
 
+ 
+<div class="messenger-content">
+  <span>@ParticipantName</span>
+  <p>@Messages.Count</p>
+  @foreach (Jessamine.Shared.Message msg in Messages)
+  {
+    <Message SentByUser="@(UserName == msg.From)" From="@msg.From" Content="@msg.Content" Date="msg.Date"/>
+  }
+</div>
+<div class="messenger-textbox">
+  <div class="input-group">
+    <input @oninput="@(OnInputChange)" value="@MessageInput" type="text" class="form-control" placeholder="Type a message" aria-label="Type a message" aria-describedby="button-addon2">
+    <button @onclick="@(() => OnClick.InvokeAsync(MessageInput))" class="btn btn-outline-primary" type="button" id="button-addon2"><i class="far fa-paper-plane"></i></button>
   </div>
 </div>
 
-<div class="input-group">
-  <input  @oninput="@(OnInputChange)" value="@MessageInput"type="text" placeholder="Type a message" aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light" />
-  <div class="input-group-append">
-    <button @onclick="@(()=> OnClick.InvokeAsync(MessageInput))"  id="button-addon2" class="btn btn-link"> <i class="far fa-paper-plane"></i></button>
-  </div>
-</div>
 
 @code {
   [Parameter]
   public string UserName { get; set; }
+
+  [Parameter]
+  public string ParticipantName { get; set; }
 
   [Parameter] public EventCallback<string> OnClick { get; set; }
   private string MessageInput => _state.Value.Input;

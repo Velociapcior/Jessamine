@@ -25,15 +25,15 @@ namespace Jessamine.Client.State.Messenger
     }
 
     [ReducerMethod]
-    public static MessengerState OnInputChanged(MessengerState state, ChangeInput action)
-    {
-      return state with {Input = action.Input};
-    }
+    public static MessengerState OnInputChanged(MessengerState state, ChangeInput action) =>
+      state with {Input = action.Input};
 
     [ReducerMethod]
-    public static MessengerState OnState(MessengerState state, ClearMessenger action)
-    {
-      return state with {Messages = new List<Message>()};
-    }
+    public static MessengerState OnStateClear(MessengerState state, ClearMessenger action) =>
+      state with {Messages = new List<Message>()};
+
+    [ReducerMethod]
+    public static MessengerState OnSetMessages(MessengerState state, SetMessages action) =>
+      state with {Messages = action.Messages};
   }
 }

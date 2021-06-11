@@ -16,9 +16,7 @@ namespace Jessamine.Client.State.Messenger.Actions
     }
   }
 
-  public record ClearMessenger()
-  {
-  }
+  public record ClearMessenger;
 
   public record ChangeInput
   {
@@ -29,4 +27,6 @@ namespace Jessamine.Client.State.Messenger.Actions
       Input = input;
     }
   }
+
+  public record SetMessages(List<Message> Messages);
 }

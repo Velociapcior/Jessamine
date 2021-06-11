@@ -14,7 +14,8 @@ namespace Jessamine.Client.State.Chat
     {
       IsConnected = action.IsConnected,
       ConnectedUserId = action.ConnectionId,
-      ConversationId = action.ConversationId
+      ConversationId = action.ConversationId,
+      ConnectedUserName = action.ConnectedUserName
     };
 
     [ReducerMethod]

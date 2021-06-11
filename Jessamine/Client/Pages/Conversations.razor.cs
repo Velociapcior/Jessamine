@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jessamine.Client.State.Conversation.Actions;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Jessamine.Client.Pages
 {
@@ -10,11 +11,16 @@ namespace Jessamine.Client.Pages
   {
     [Parameter]
     public long? ConversationId { get; set; }
+    private string _userName;
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
+      var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+      var user = authState.User;
 
-      return base.OnInitializedAsync();
+      _userName = user.Identity.Name;
+
+      await base.OnInitializedAsync();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -24,5 +30,10 @@ namespace Jessamine.Client.Pages
         _dispatcher.Dispatch(new FetchConversations(ConversationId));
       }
     }
+
+    private async Task Send(string input)
+    {
+    }
+
   }
 }

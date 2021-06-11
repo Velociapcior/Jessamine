@@ -15,6 +15,7 @@ namespace Jessamine.Client.State.Chat
     public TimeSpan TimeToEnd { get; init; }
     public bool UserContinue { get; init; }
     public bool ParticipantContinue { get; init; }
+    public string ConnectedUserName { get; init; }
   }
 
   public class ChatFeatureState : Feature<ChatState>
