@@ -1,6 +1,7 @@
 ﻿@page "/conversations/{ConversationId:long?}"
 
 @using Jessamine.Client.State.Conversation
+@using Jessamine.Client.State.Conversation.Actions
 
 @attribute [Authorize]
 @inject IState<ConversationState> _conversationState
@@ -14,7 +15,7 @@
 
 <div class="row rounded-lg shadow">
   <!-- Users box-->
-  <div class="col-5 px-0">
+  <div class="col-3 px-0">
     <div class="bg-white">
 
       <div class="bg-gray px-4 py-2 bg-light">
@@ -41,7 +42,7 @@
             }
             else
             {
-              <a id="@conversation.Id" class="list-group-item list-group-item-action list-group-item-light rounded-0">
+              <a id="@conversation.Id"  @onclick="() => SelectConversation(conversation.Id)" class="list-group-item list-group-item-action list-group-item-light rounded-0">
                 <div class="media">
                   <img src="https://res.cloudinary.com/mhmd/image/upload/v1564960395/avatar_usae7z.svg" alt="user" width="50" class="rounded-circle">
                   <div class="media-body ml-4">
@@ -58,7 +59,7 @@
       </div>
     </div>
   </div>
-  <div class="col-7 px-0">
+  <div class="col-9 px-0">
     <Messenger OnClick="Send" UserName="@_userName" ParticipantName="@_conversationState.Value.SelectedConversation.ParticipantName" />
   </div>
 </div>

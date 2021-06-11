@@ -35,5 +35,9 @@ namespace Jessamine.Client.Pages
     {
     }
 
+    private void SelectConversation(long id)
+    {
+      _dispatcher.Dispatch(new SetSelectedConversation(id));
+    }
   }
 }
