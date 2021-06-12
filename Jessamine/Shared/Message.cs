@@ -17,5 +17,7 @@ namespace Jessamine.Shared
     public DateTime Date { get; set; }
 
     public string Content { get; set; }
+
+    public long ConversationId { get; set; }
   }
 }

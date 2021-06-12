@@ -18,4 +18,6 @@ namespace Jessamine.Client.State.Conversation.Actions
   }
 
   public record SetSelectedConversation(long ConversationId);
+
+  public record SendMessage(Jessamine.Shared.Message Message);
 }

@@ -12,6 +12,7 @@ namespace Jessamine.Client.Pages
     [Parameter]
     public long? ConversationId { get; set; }
     private string _userName;
+    private long SelectedConversationId => _conversationState.Value.SelectedConversationId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -31,8 +32,23 @@ namespace Jessamine.Client.Pages
       }
     }
 
-    private async Task Send(string input)
+    private void Send(string input)
     {
+      if (string.IsNullOrEmpty(input))
+      {
+        return;
+      }
+
+      var message = new Jessamine.Shared.Message
+      {
+        Content = input,
+        ConversationId = SelectedConversationId,
+        Date = DateTime.Now,
+        From = _userName,
+        To = _conversationState.Value.SelectedConversation.ParticipantName
+      };
+
+      _dispatcher.Dispatch(new SendMessage(message));
     }
 
     private void SelectConversation(long id)

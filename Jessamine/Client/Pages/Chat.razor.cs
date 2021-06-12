@@ -179,6 +179,11 @@ namespace Jessamine.Client.Pages
 
     private async Task Send(string input)
     {
+      if (string.IsNullOrEmpty(input))
+      {
+        return;
+      }
+
       await _hubConnection.SendAsync("SendMessage", _chatState.Value.ConnectedUserId, input,
         _chatState.Value.ConversationId);
 
