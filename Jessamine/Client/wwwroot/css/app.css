@@ -1,5 +1,10 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden
+}
 
 a, .btn-link {
   color: #0366d6;
@@ -47,8 +52,13 @@ a, .btn-link {
   }
 
 .messenger-content {
-  overflow: scroll;
-  min-height: calc(100vh - 3.5rem);
+  overflow-y: scroll;
+  height: calc(100vh - 9.5rem);
+}
+
+.messages-box {
+  overflow-y: scroll;
+  height: calc(100vh - 10.5rem);
 }
 
 .messenger-textbox {
@@ -57,4 +67,12 @@ a, .btn-link {
   z-index: 150;
   _position: absolute;
   _top: expression(eval(document.documentElement.scrollTop+ (document.documentElement.clientHeight-this.offsetHeight)));
+}
+
+.message-body {
+  width: fit-content;
+}
+
+.text-small {
+  font-size: 0.9rem;
 }

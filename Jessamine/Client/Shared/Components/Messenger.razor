@@ -3,16 +3,25 @@
 @using Jessamine.Client.State.Messenger.Actions
 @using System.ComponentModel.DataAnnotations
 @inherits FluxorComponent
+@implements IAsyncDisposable
 
 
- 
-<div class="messenger-content">
+
+<div class="messenger-content shadow rounded">
   <span>@ParticipantName</span>
   <p>@Messages.Count</p>
-  @foreach (Jessamine.Shared.Message msg in Messages)
+  @for (int i = 0; i < Messages.Count; i++)
   {
-    <Message SentByUser="@(UserName == msg.From)" From="@msg.From" Content="@msg.Content" Date="msg.Date"/>
+    bool isMessageBlock = false;
+
+    if (i < Messages.Count - 1)
+    {
+      isMessageBlock = Messages[i].From == Messages[i + 1].From && Messages[i + 1].Date - Messages[i].Date <= TimeSpan.FromMinutes(1);
+    }
+
+    <Message IsMessageBlock="@isMessageBlock" SentByUser="@(UserName == Messages[i].From)" From="@Messages[i].From" Content="@Messages[i].Content" Date="Messages[i].Date" />
   }
+
 </div>
 <div class="messenger-textbox">
   <div class="input-group">
@@ -36,6 +45,11 @@
 
   private void OnInputChange(ChangeEventArgs args)
   {
-    _dispatcher.Dispatch(new ChangeInput((string) args.Value));
-  } 
+    _dispatcher.Dispatch(new ChangeInput((string)args.Value));
+  }
+
+  public async ValueTask DisposeAsync()
+  {
+    await new Task(() =>_dispatcher.Dispatch(new ClearMessenger()));
+  }
 }

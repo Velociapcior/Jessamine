@@ -1,25 +1,30 @@
 ﻿@if (SentByUser)
 {
-  <div class="media w-50 ml-auto mb-3">
-    <div class="media-body">
-      <div class="bg-primary rounded py-2 px-3 mb-2">
-        <p class="text-small mb-0 text-white">@Content</p>
+  <div class="offset-5 col-7 float-end @(IsMessageBlock ? "mb-1" : "mb-3")">
+    <div class="">
+      <div class="message-body float-end  shadow bg-primary bg-gradient rounded py-2 px-3 @(IsMessageBlock ? "mb-1" : "mb-2")">
+        <span class="mb-0 text-white">@Content</span>
       </div>
-      <p class="small text-muted">@Date.ToShortDateString() : @Date.ToShortTimeString()</p>
+      @if (!IsMessageBlock)
+      {
+        <p class="small text-muted ">@Date.ToShortDateString() : @Date.ToShortTimeString()</p>
+      }
     </div>
   </div>
 }
 else
 {
   <!-- Sender Message-->
-  <div class="media w-50 mb-3">
-    <img src="https://res.cloudinary.com/mhmd/image/upload/v1564960395/avatar_usae7z.svg" alt="user" width="50" class="rounded-circle">
-    <div class="media-body ml-3">
-      @From 
-      <div class="bg-light rounded py-2 px-3 mb-2">
-        <p class="text-small mb-0 text-muted">@Content</p>
+  <div class="col-7 float-start d-flex media @(IsMessageBlock ? "mb-1" : "mb-3")">
+    <span class="float-start me-3 @(IsMessageBlock ? "invisible" : "visible")"><i class="fas fa-user-circle fa-2x"></i></span>
+    <div class="message-body media-body ml-3">
+      <div class="bg-secondary bg-gradient shadow rounded py-2 px-3 @(IsMessageBlock ? string.Empty : "mb-2")">
+        <p class="text-small text-light mb-0">@Content</p>
       </div>
-      <p class="small text-muted">@Date.ToShortDateString() : @Date.ToShortTimeString()</p>
+      @if (!IsMessageBlock)
+      {
+        <p class="small text-muted ">@Date.ToShortDateString() : @Date.ToShortTimeString()</p>
+      }
     </div>
   </div>
 }
@@ -36,4 +41,8 @@ else
 
   [Parameter]
   public string From { get; set; }
+
+  [Parameter]
+  public bool IsMessageBlock { get; set; }
+
 }
