@@ -25,6 +25,11 @@ namespace Jessamine.Client.State.Messenger.Effects
       List<Jessamine.Shared.Message> messages = await Http.GetFromJsonAsync<List<Jessamine.Shared.Message>>($"api/messages?conversationId={action.ConversationId}");
 
       dispatcher.Dispatch(new SetMessages(messages));
+      
+      if (messages is {Count: > 0})
+      {
+        dispatcher.Dispatch(new SetLastMessageId(messages.Last().Id));
+      }
     }
   }
 }

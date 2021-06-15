@@ -35,5 +35,13 @@ namespace Jessamine.Client.State.Messenger
     [ReducerMethod]
     public static MessengerState OnSetMessages(MessengerState state, SetMessages action) =>
       state with {Messages = action.Messages};
+
+    [ReducerMethod]
+    public static MessengerState OnAppendMessages(MessengerState state, AppendMessages action)
+    {
+      var messages = state.Messages.Concat(action.Messages);
+
+      return state with { Messages = messages.ToList() };
+    }
   }
 }

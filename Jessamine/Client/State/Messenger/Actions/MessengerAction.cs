@@ -29,4 +29,6 @@ namespace Jessamine.Client.State.Messenger.Actions
   }
 
   public record SetMessages(List<Message> Messages);
+
+  public record AppendMessages(List<Message> Messages);
 }

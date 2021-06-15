@@ -1,9 +1,11 @@
 ﻿@inject IState<MessengerState> _state
 @inject IDispatcher _dispatcher
+@inject IJSRuntime _js
 @using Jessamine.Client.State.Messenger.Actions
 @using System.ComponentModel.DataAnnotations
 @inherits FluxorComponent
 @implements IAsyncDisposable
+
 
 <div class="messenger-content shadow rounded">
   <span>@ParticipantName</span>
@@ -17,12 +19,12 @@
       isMessageBlock = Messages[i].From == Messages[i + 1].From && Messages[i + 1].Date - Messages[i].Date <= TimeSpan.FromMinutes(1);
     }
 
-    <Message
-      IsMessageBlock="@isMessageBlock"
-      SentByUser="@(UserName == Messages[i].From)"
-      From="@Messages[i].From" 
-      Content="@Messages[i].Content"
-      Date="Messages[i].Date" />
+    <Message IsMessageBlock="@isMessageBlock"
+             SentByUser="@(UserName == Messages[i].From)"
+             From="@Messages[i].From"
+             Content="@Messages[i].Content"
+             Date="@Messages[i].Date" 
+             Id="@Messages[i].Id"/>
   }
 
 </div>
@@ -34,6 +36,19 @@
 </div>
 
 @code {
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (Messages.Count > 0)
+    {
+      var id = $"message-{Messages.Last().Id}";
+
+      await _js.InvokeVoidAsync("scrollToId", id);
+
+      await base.OnAfterRenderAsync(firstRender);
+    }
+  }
+
   [Parameter]
   public string UserName { get; set; }
 
@@ -52,7 +67,7 @@
 
   public async ValueTask DisposeAsync()
   {
-    await new Task(() =>_dispatcher.Dispatch(new ClearMessenger()));
+    await new Task(() => _dispatcher.Dispatch(new ClearMessenger()));
   }
 
   private async Task OnKeyPressAsync(KeyboardEventArgs e)

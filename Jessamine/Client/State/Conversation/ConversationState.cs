@@ -11,6 +11,8 @@ namespace Jessamine.Client.State.Conversation
     public long SelectedConversationId { get; init; }
 
     public ConversationModel SelectedConversation { get; init; }
+
+    public long LastMessageId { get; init; }
   }
 
   public class ConversationFeatureState : Feature<ConversationState>
@@ -21,7 +23,8 @@ namespace Jessamine.Client.State.Conversation
     {
       Conversations = new List<ConversationModel>(),
       SelectedConversationId = default,
-      SelectedConversation = new ConversationModel()
+      SelectedConversation = new ConversationModel(),
+      LastMessageId = default
     };
   }
 }

@@ -14,6 +14,13 @@
 </head>
 
 <body>
+  <script>
+    window.scrollToId = (id) => {
+      var element = document.getElementById(id);
+
+      element.scrollIntoView();
+    }
+  </script>
   <div id="app">Loading...</div>
 
   <div id="blazor-error-ui">
@@ -21,6 +28,7 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
   </div>
+
   <script src="https://kit.fontawesome.com/1d820a50e3.js" crossorigin="anonymous"></script>
   <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
   <script src="_framework/blazor.webassembly.js"></script>

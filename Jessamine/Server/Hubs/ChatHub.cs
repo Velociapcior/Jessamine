@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using IdentityServer4.Stores;
 using Jessamine.Server.Data;
+using Jessamine.Server.Extensions;
 using Jessamine.Server.Models;
 using Jessamine.Server.Services.Converters.Interfaces;
 using Jessamine.Server.Services.Interfaces;
@@ -78,9 +79,11 @@ namespace Jessamine.Server.Hubs
 
           _pairingProvider.SetConversation(Context.ConnectionId, pairedUserConnectionId, conversation.Entity.Id, conversation.Entity.StartedDate);
 
-          await Clients.Client(pairedUserConnectionId).SendAsync("ConnectWithUser", true, Context.ConnectionId, conversation.Entity.Id, currentUser.UserName);
+          var clientTask = Clients.Client(pairedUserConnectionId).SendAsync("ConnectWithUser", true, Context.ConnectionId, conversation.Entity.Id, currentUser.UserName);
 
-          await Clients.Client(Context.ConnectionId).SendAsync("ConnectWithUser", true, pairedUserConnectionId, conversation.Entity.Id, pairedUser.UserName);
+          var callerTask = Clients.Client(Context.ConnectionId).SendAsync("ConnectWithUser", true, pairedUserConnectionId, conversation.Entity.Id, pairedUser.UserName);
+
+          await TaskExt.WhenAll(callerTask, clientTask);
         }
       }
       catch (Exception e)
@@ -177,8 +180,10 @@ namespace Jessamine.Server.Hubs
 
       var message = _messageConverter.Map(entityMessage.Entity);
 
-      await Clients.Caller.SendAsync("ReceiveMessage", message);
-      await Clients.Client(connectionId).SendAsync("ReceiveMessage", message);
+      var callerTask = Clients.Caller.SendAsync("ReceiveMessage", message);
+      var clientTask = Clients.Client(connectionId).SendAsync("ReceiveMessage", message);
+
+      await TaskExt.WhenAll(callerTask, clientTask);
     }
 
     public async Task ParticipantAgreedToContinue(string connectedUserId)

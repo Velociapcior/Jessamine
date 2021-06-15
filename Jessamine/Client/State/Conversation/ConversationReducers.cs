@@ -24,5 +24,9 @@ namespace Jessamine.Client.State.Conversation
       SelectedConversationId = action.ConversationId,
       SelectedConversation = state.Conversations.FirstOrDefault(x => x.Id == action.ConversationId)
     };
+
+    [ReducerMethod]
+    public static ConversationState OnSetLastMessageId(ConversationState state, SetLastMessageId action) =>
+      state with {LastMessageId = action.Id};
   }
 }

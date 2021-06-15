@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -39,12 +40,31 @@ namespace Jessamine.Client.State.Conversation.Effects
     public async Task SendMessage(SendMessage action, IDispatcher dispatcher)
     {
       var response = await Http.PostAsJsonAsync("api/messages", action.Message);
-
+      
       if (response.IsSuccessStatusCode)
       {
         dispatcher.Dispatch(new ReceiveMessage(action.Message));
 
         dispatcher.Dispatch(new ChangeInput(String.Empty));
+
+        if (Int32.TryParse(await response.Content.ReadAsStringAsync(), out var messageId))
+        {
+          dispatcher.Dispatch(new SetLastMessageId(messageId));
+        };
+      }
+    }
+
+    [EffectMethod]
+    public async Task GetNewMessages(GetNewMessages action, IDispatcher dispatcher)
+    {
+      var response = await Http.GetFromJsonAsync <List<Jessamine.Shared.Message>>(
+                       $"api/messages/new?mesageId={action.LastMessageId}&conversationId={action.ConversationId}");
+
+      if (response is {Count: > 0})
+      {
+        dispatcher.Dispatch(new SetLastMessageId(response.Last().Id));
+
+        dispatcher.Dispatch(new AppendMessages(response));
       }
     }
   }

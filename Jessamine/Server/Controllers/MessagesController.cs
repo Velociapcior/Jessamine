@@ -7,10 +7,12 @@ using IdentityServer4.Validation;
 using Jessamine.Server.Data;
 using Jessamine.Server.Models;
 using Jessamine.Server.Services.Converters.Interfaces;
+using Jessamine.Shared.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Message = Jessamine.Shared.Message;
 
 namespace Jessamine.Server.Controllers
 {
@@ -37,7 +39,7 @@ namespace Jessamine.Server.Controllers
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Shared.Message>> Get([FromQuery] int conversationId)
+    public async Task<IEnumerable<Shared.Message>> Get([FromQuery] long conversationId)
     {
       var user = await _userManager.GetUserAsync(HttpContext.User);
 
@@ -52,6 +54,26 @@ namespace Jessamine.Server.Controllers
       return messages;
     }
 
+    [HttpGet]
+    [Route("new")]
+    public async Task<IEnumerable<Message>> GetNewMessages([FromQuery] long mesageId, [FromQuery] long conversationId)
+    {
+      var user = await _userManager.GetUserAsync(HttpContext.User);
+
+      var entityMessages =
+        _context.Messages
+          .Where(x =>
+            x.Conversation.Id == conversationId &&
+            x.Conversation.Participants.Contains(user))
+          .Include(x => x.Conversation)
+          .AsEnumerable()
+          .SkipWhile(x => x.Id <= mesageId);
+      
+      var messages = entityMessages.Select(e => _messageConverter.Map(e));
+
+      return messages;
+    }
+
     [HttpPost]
     public async Task<IActionResult> Post(Shared.Message message)
     {
@@ -60,12 +82,16 @@ namespace Jessamine.Server.Controllers
         var messageEntity = _messageConverter.Map(message);
         var conversation = await _context.Conversations.FindAsync(message.ConversationId);
 
+        conversation.LastMessage = message.Content;
+        conversation.LastMessageDate = message.Date;
+        conversation.LastMessageStatus = (int) MessageStatus.Sent;
+
         messageEntity.Conversation = conversation;
-        _context.Messages.Add(messageEntity);
+        var entry = _context.Messages.Add(messageEntity);
 
         await _context.SaveChangesAsync();
 
-        return Ok();
+        return new JsonResult(entry.Entity.Id);
       }
       catch (Exception e)
       {

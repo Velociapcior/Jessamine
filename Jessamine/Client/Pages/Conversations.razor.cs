@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Jessamine.Client.State.Conversation.Actions;
 using Microsoft.AspNetCore.Components;
@@ -11,8 +13,14 @@ namespace Jessamine.Client.Pages
   {
     [Parameter]
     public long? ConversationId { get; set; }
+
     private string _userName;
+
     private long SelectedConversationId => _conversationState.Value.SelectedConversationId;
+
+    private long LastMessageId => _conversationState.Value.LastMessageId;
+
+    private Timer _timer;
 
     protected override async Task OnInitializedAsync()
     {
@@ -30,6 +38,11 @@ namespace Jessamine.Client.Pages
       {
         _dispatcher.Dispatch(new FetchConversations(ConversationId));
       }
+
+      _timer = new Timer(state =>
+      {
+        _dispatcher.Dispatch(new GetNewMessages(SelectedConversationId, LastMessageId));
+      }, null, 3000, 5000);
     }
 
     private void Send(string input)
@@ -54,6 +67,11 @@ namespace Jessamine.Client.Pages
     private void SelectConversation(long id)
     {
       _dispatcher.Dispatch(new SetSelectedConversation(id));
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+      await new Task(() => {});
     }
   }
 }

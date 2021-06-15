@@ -49,8 +49,7 @@ namespace Jessamine.Server.Controllers
           .Where(c => c.Participants.Contains(user) && c.Accepted)
           .Include(x => x.Participants)
           .OrderByDescending(x => x.LastMessageDate);
-
-
+        
         var conversations =
           conversationEntities
             .Select(x => 
