@@ -166,6 +166,8 @@ namespace Jessamine.Client.Pages
           await CreateHubConnection();
 
           await _hubConnection.SendAsync("QueueForConversation");
+
+          _dispatcher.Dispatch(new ClearMessenger());
         }
         catch (NullReferenceException e)
         {
