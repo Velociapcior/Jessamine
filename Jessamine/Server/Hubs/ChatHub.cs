@@ -16,7 +16,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace Jessamine.Server.Hubs
@@ -62,21 +65,38 @@ namespace Jessamine.Server.Hubs
 
           var participants = new List<ApplicationUser>();
 
-          var currentUser = await _userManager.GetUserAsync(Context.User);
-          var pairedUser = await _userManager.FindByIdAsync(_connections.GetUser(pairedUserConnectionId));
+          EntityEntry<Conversation> conversation;
 
-          participants.Add(currentUser);
-          participants.Add(pairedUser);
+          ApplicationUser currentUser;
+          ApplicationUser pairedUser;
 
-          var conversation = _context.Conversations.Add(new Conversation
+          await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+          try
           {
-            Messages = new List<Message>(),
-            Participants = participants,
-            StartedDate = DateTime.Now
-          });
-          
-          await _context.SaveChangesAsync();
+            currentUser = await _userManager.GetUserAsync(Context.User);
+            pairedUser = await _userManager.FindByIdAsync(_connections.GetUser(pairedUserConnectionId));
 
+            participants.Add(currentUser);
+            participants.Add(pairedUser);
+
+            conversation = _context.Conversations.Add(new Conversation
+            {
+              Messages = new List<Message>(),
+              Participants = participants,
+              StartedDate = DateTime.Now
+            });
+            
+            await _context.SaveChangesAsync();
+          }
+          catch (Exception e)
+          {
+            await transaction.RollbackAsync();
+            _logger.LogCritical(e,$"Error while accessing database");
+            throw;
+          }
+
+          await transaction.CommitAsync();
+          
           _pairingProvider.SetConversation(Context.ConnectionId, pairedUserConnectionId, conversation.Entity.Id, conversation.Entity.StartedDate);
 
           var clientTask = Clients.Client(pairedUserConnectionId).SendAsync("ConnectWithUser", true, Context.ConnectionId, conversation.Entity.Id, currentUser.UserName);
@@ -156,34 +176,46 @@ namespace Jessamine.Server.Hubs
 
     public async Task SendMessage(string connectionId, string content, long conversationId)
     {
-      var from = await _userManager.GetUserAsync(Context.User);
-      var to = _userManager.Users.Single(x => x.Id == _connections.GetUser(connectionId));
-
-      var conversation = await _context.Conversations.FindAsync(conversationId);
-
-      Message messageDto = new Message
+      await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+      try
       {
-        Content = content,
-        Date = DateTime.Now,
-        From = from.UserName,
-        To = to.UserName,
-        Conversation = conversation
-      };
+        var from = await _userManager.GetUserAsync(Context.User);
+        var to = _userManager.Users.Single(x => x.Id == _connections.GetUser(connectionId));
 
-      conversation.LastMessage = content;
-      conversation.LastMessageDate = messageDto.Date;
-      conversation.LastMessageStatus = 3;
+        var conversation = await _context.Conversations.FindAsync(conversationId);
 
-      var entityMessage = _context.Messages.Add(messageDto);
+        Message messageDto = new Message
+        {
+          Content = content,
+          Date = DateTime.Now,
+          From = from.UserName,
+          To = to.UserName,
+          Conversation = conversation
+        };
 
-      await _context.SaveChangesAsync();
+        conversation.LastMessage = content;
+        conversation.LastMessageDate = messageDto.Date;
+        conversation.LastMessageStatus = 3;
 
-      var message = _messageConverter.Map(entityMessage.Entity);
+        var entityMessage = _context.Messages.Add(messageDto);
 
-      var callerTask = Clients.Caller.SendAsync("ReceiveMessage", message);
-      var clientTask = Clients.Client(connectionId).SendAsync("ReceiveMessage", message);
+        await _context.SaveChangesAsync();
 
-      await TaskExt.WhenAll(callerTask, clientTask);
+        var message = _messageConverter.Map(entityMessage.Entity);
+
+        var callerTask = Clients.Caller.SendAsync("ReceiveMessage", message);
+        var clientTask = Clients.Client(connectionId).SendAsync("ReceiveMessage", message);
+
+        await TaskExt.WhenAll(callerTask, clientTask);
+      }
+      catch (Exception e)
+      {
+        await transaction.RollbackAsync();
+        _logger.LogCritical(e, $"Failed to send messege from User: {Context.UserIdentifier} to conversation {connectionId}");
+        throw;
+      }
+
+      await transaction.CommitAsync();
     }
 
     public async Task ParticipantAgreedToContinue(string connectedUserId)

@@ -9,6 +9,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Fluxor;
+using Humanizer.Configuration;
+using Humanizer.DateTimeHumanizeStrategy;
 
 namespace Jessamine.Client
 {
@@ -34,7 +36,10 @@ namespace Jessamine.Client
         config.ScanAssemblies(typeof(Program).Assembly);
         config.UseReduxDevTools();
       });
-      
+
+      Configurator.DateTimeHumanizeStrategy = new PrecisionDateTimeHumanizeStrategy(precision: .99);
+      Configurator.DateTimeOffsetHumanizeStrategy = new PrecisionDateTimeOffsetHumanizeStrategy(precision: .99); // configure when humanizing DateTimeOffset
+     
       await DebugDelayAsync();
       await builder.Build().RunAsync();
     }

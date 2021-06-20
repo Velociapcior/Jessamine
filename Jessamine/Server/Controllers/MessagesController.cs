@@ -11,6 +11,7 @@ using Jessamine.Shared.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Message = Jessamine.Shared.Message;
 
@@ -68,7 +69,7 @@ namespace Jessamine.Server.Controllers
           .Include(x => x.Conversation)
           .AsEnumerable()
           .SkipWhile(x => x.Id <= mesageId);
-      
+
       var messages = entityMessages.Select(e => _messageConverter.Map(e));
 
       return messages;
@@ -77,6 +78,7 @@ namespace Jessamine.Server.Controllers
     [HttpPost]
     public async Task<IActionResult> Post(Shared.Message message)
     {
+      await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
       try
       {
         var messageEntity = _messageConverter.Map(message);
@@ -84,20 +86,23 @@ namespace Jessamine.Server.Controllers
 
         conversation.LastMessage = message.Content;
         conversation.LastMessageDate = message.Date;
-        conversation.LastMessageStatus = (int) MessageStatus.Sent;
+        conversation.LastMessageStatus = (int)MessageStatus.Sent;
 
         messageEntity.Conversation = conversation;
         var entry = _context.Messages.Add(messageEntity);
 
         await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         return new JsonResult(entry.Entity.Id);
       }
       catch (Exception e)
       {
+        await transaction.RollbackAsync();
         _logger.LogError(e, $"Error while adding message {message.ConversationId}");
         return BadRequest();
       }
     }
+
   }
 }

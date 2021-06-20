@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Jessamine.Client.State.Conversation.Actions;
+using Jessamine.Shared.Common;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 
@@ -15,6 +16,9 @@ namespace Jessamine.Client.Pages
     public long? ConversationId { get; set; }
 
     private string _userName;
+
+    private bool _readLastMessage =>
+      _conversationState.Value.SelectedConversation.LastMessageStatus == MessageStatus.Read;
 
     private long SelectedConversationId => _conversationState.Value.SelectedConversationId;
 

@@ -2,6 +2,7 @@
 
 @using Jessamine.Client.State.Conversation
 @using Jessamine.Client.State.Conversation.Actions
+@using Humanizer
 
 @attribute [Authorize]
 @inject IState<ConversationState> _conversationState
@@ -35,9 +36,14 @@
                   <i class="fas fa-user-circle fa-2x"></i>
                   <div class="media-body ml-4">
                     <div class="d-flex align-items-center justify-content-between mb-1">
-                      <h6 class="mb-0">@conversation.ParticipantName</h6><small class="small font-weight-bold">@conversation.LastMessageDate</small>
+                      <h6 class="mb-0 @(_readLastMessage ? null : "fw-bolder")">@conversation.ParticipantName</h6>
+                      <small class="small @(_readLastMessage ? null : "fw-bolder")">
+                        @(@conversation.LastMessageDate < DateTime.Now.AddDays(-2) ?
+                          conversation.LastMessageDate.ToOrdinalWords() :
+                          @conversation.LastMessageDate.Humanize(false))
+                      </small>
                     </div>
-                    <p class="font-italic mb-0 text-small">@conversation.LastMessage</p>
+                    <p class="font-italic mb-0 text-small @(_readLastMessage ? null : "fw-bolder")">@conversation.LastMessage</p>
                   </div>
                 </div>
               </a>
@@ -49,9 +55,14 @@
                   <i class="fas fa-user-circle fa-2x"></i>
                   <div class="media-body ml-4">
                     <div class="d-flex align-items-center justify-content-between mb-1">
-                      <h6 class="mb-0">@conversation.ParticipantName</h6><small class="small font-weight-bold">@conversation.LastMessageDate</small>
+                      <h6 class="mb-0 @(_readLastMessage ? null : "fw-bolder")">@conversation.ParticipantName</h6>
+                      <small class="small @(_readLastMessage ? null : "fw-bolder")">
+                        @(@conversation.LastMessageDate < DateTime.Now.AddDays(-2) ?
+                          conversation.LastMessageDate.ToOrdinalWords() :
+                          @conversation.LastMessageDate.Humanize(false))
+                      </small>
                     </div>
-                    <p class="font-italic text-muted mb-0 text-small">@conversation.LastMessage</p>
+                    <p class="font-italic text-muted mb-0 text-small @(_readLastMessage ? null : "fw-bolder")">@conversation.LastMessage</p>
                   </div>
                 </div>
               </a>

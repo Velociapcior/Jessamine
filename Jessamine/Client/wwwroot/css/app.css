@@ -73,6 +73,16 @@ a, .btn-link {
   width: fit-content;
 }
 
+.message-body-sent-by-user {
+  width: fit-content;
+  margin-left: auto;
+}
+
+.message-container {
+  display: flex;
+  flex-direction: column;
+}
+
 .text-small {
   font-size: 0.9rem;
 }

@@ -28,6 +28,8 @@ namespace Jessamine.Client.State.Messenger.Effects
       
       if (messages is {Count: > 0})
       {
+        var lastMessageId = messages.Last().Id;
+
         dispatcher.Dispatch(new SetLastMessageId(messages.Last().Id));
       }
     }
