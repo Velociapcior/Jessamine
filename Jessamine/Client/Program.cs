@@ -21,7 +21,7 @@ namespace Jessamine.Client
       var builder = WebAssemblyHostBuilder.CreateDefault(args);
       builder.RootComponents.Add<App>("#app");
 
-      builder.Logging.SetMinimumLevel(LogLevel.Debug);
+      builder.Logging.SetMinimumLevel(LogLevel.Warning);
 
       builder.Services.AddHttpClient("Jessamine.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
           .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();

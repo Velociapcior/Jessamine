@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Jessamine.Shared.Common;
 
 namespace Jessamine.Client.State.Conversation.Actions
 {
@@ -24,4 +25,8 @@ namespace Jessamine.Client.State.Conversation.Actions
   public record GetNewMessages(long ConversationId, long LastMessageId);
 
   public record SetLastMessageId(long Id);
+
+  public record UpdateLastMessageStatus(long ConversationId, MessageStatus Status);
+
+  public record SetLastMessageStatus(long ConversationId, MessageStatus Status);
 }

@@ -18,15 +18,31 @@ namespace Jessamine.Client.State.Conversation
     [ReducerMethod]
     public static ConversationState OnSetSelectedConversation(
       ConversationState state,
-      SetSelectedConversation action) => 
+      SetSelectedConversation action) =>
       state with
-    {
-      SelectedConversationId = action.ConversationId,
-      SelectedConversation = state.Conversations.FirstOrDefault(x => x.Id == action.ConversationId)
-    };
+      {
+        SelectedConversationId = action.ConversationId,
+        SelectedConversation = state.Conversations.FirstOrDefault(x => x.Id == action.ConversationId)
+      };
 
     [ReducerMethod]
     public static ConversationState OnSetLastMessageId(ConversationState state, SetLastMessageId action) =>
-      state with {LastMessageId = action.Id};
+      state with { LastMessageId = action.Id };
+
+    [ReducerMethod]
+    public static ConversationState OnSetLastMessageStatus(ConversationState state, SetLastMessageStatus action)
+    {
+      Jessamine.Shared.Conversation selectedConversation = state.SelectedConversation;
+
+      if (state.SelectedConversation.Id == action.ConversationId)
+      {
+        selectedConversation.LastMessageStatus = action.Status;
+      }
+
+      return state with
+      {
+        SelectedConversation = selectedConversation
+      };
+    }
   }
 }

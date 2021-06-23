@@ -3,17 +3,20 @@
 @using System.Globalization
 @if (SentByUser)
 {
-  <div class="offset-5 col-7 float-end .message-container @(IsMessageBlock ? "mb-1" : "mb-3")">
-      <div class="message-body-sent-by-user float-end">
-        <div id="message-@Id" class=" shadow bg-primary bg-gradient rounded py-2 px-3 @(IsMessageBlock ? "mb-1" : "mb-2")">
-          <span class="mb-0 text-white">@Content</span>
-        </div>
-      </div>
-      @if (!IsMessageBlock)
-      {
-        <p title="@Date" class="small text-muted message-body-sent-by-user">@(Date < DateTime.Now.AddDays(-2) ? Date.ToOrdinalWords() : Date.Humanize(false, culture:  CultureInfo.InvariantCulture))</p>
-      }
+<div class="offset-5 col-7 float-end .message-container @(IsMessageBlock ? "mb-1" : "mb-3")">
+  <div class="message-body-sent-by-user float-end">
+    <div id="message-@Id" class=" shadow bg-primary bg-gradient rounded py-2 px-3 @(IsMessageBlock ? "mb-1" : "mb-2")">
+      <span class="mb-0 text-white">@Content</span>
+    </div>
   </div>
+  @if (!IsMessageBlock)
+  {
+    <div class="message-body-sent-by-user float-end">
+    <span title="@Date" class="small text-muted">@(Date < DateTime.Now.AddDays(-2) ? Date.ToOrdinalWords() : Date.Humanize(false, culture:  CultureInfo.InvariantCulture))</span>
+     <i class="ms-1 fas fa-check-double text-info"></i>
+   </div>
+  }
+</div>
 }
 else
 {

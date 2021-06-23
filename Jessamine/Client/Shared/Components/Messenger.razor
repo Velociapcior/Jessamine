@@ -3,11 +3,10 @@
 @inject IJSRuntime _js
 @using Jessamine.Client.State.Messenger.Actions
 @using System.ComponentModel.DataAnnotations
+@using Jessamine.Shared.Common
 @inherits FluxorComponent
-@implements IAsyncDisposable
 
-
-<div class="messenger-content shadow rounded">
+<div class="messenger-content">
   <span>@ParticipantName</span>
   <p>@Messages.Count</p>
   @for (int i = 0; i < Messages.Count; i++)
@@ -26,8 +25,29 @@
              Date="@Messages[i].Date" 
              Id="@Messages[i].Id"/>
   }
-
 </div>
+
+@if (Messages.LastOrDefault()?.From == UserName)
+{
+  switch (LastMessageStatus)
+  {
+    case MessageStatus.NotSet:
+      break;
+    case MessageStatus.Sent:
+      <i class="fas fa-check text-muted"></i>
+      break;
+    case MessageStatus.Received:
+      <i class="fas fa-check-double text-muted"></i>
+      break;
+    case MessageStatus.Read:
+      <i class="fas fa-check-double text-info"></i>
+      break;
+    default:
+      @string.Empty;
+      break;
+  }
+}
+
 <div class="messenger-textbox">
   <div class="input-group">
     <input @oninput="@(OnInputChange)" @onkeyup="@OnKeyPressAsync" value="@MessageInput" type="text" class="form-control" placeholder="Type a message" aria-label="Type a message" aria-describedby="button-addon2">
@@ -36,6 +56,20 @@
 </div>
 
 @code {
+  [Parameter]
+  public string UserName { get; set; }
+
+  [Parameter]
+  public string ParticipantName { get; set; }
+
+  [Parameter] public EventCallback<string> OnClick { get; set; }
+
+  [Parameter]
+  public MessageStatus LastMessageStatus { get; set; }
+
+  private string MessageInput => _state.Value.Input;
+
+  private List<Jessamine.Shared.Message> Messages => _state.Value.Messages;
 
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
@@ -49,25 +83,16 @@
     }
   }
 
-  [Parameter]
-  public string UserName { get; set; }
-
-  [Parameter]
-  public string ParticipantName { get; set; }
-
-  [Parameter] public EventCallback<string> OnClick { get; set; }
-  private string MessageInput => _state.Value.Input;
-
-  private List<Jessamine.Shared.Message> Messages => _state.Value.Messages;
-
   private void OnInputChange(ChangeEventArgs args)
   {
     _dispatcher.Dispatch(new ChangeInput((string)args.Value));
   }
 
-  public async ValueTask DisposeAsync()
+  protected override void Dispose(bool disposing)
   {
-    await new Task(() => _dispatcher.Dispatch(new ClearMessenger()));
+    _dispatcher.Dispatch(new ClearMessenger());
+
+    base.Dispose(disposing);
   }
 
   private async Task OnKeyPressAsync(KeyboardEventArgs e)

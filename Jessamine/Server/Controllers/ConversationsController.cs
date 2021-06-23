@@ -67,5 +67,31 @@ namespace Jessamine.Server.Controllers
         throw;
       }
     }
+
+    [HttpPatch]
+    [Route("{id}")]
+    public async Task<IActionResult> Patch(long id, Shared.Conversation conversation)
+    {
+      try
+      {
+        var conversationEntity = await _context.Conversations.FindAsync(id);
+
+        if (conversationEntity == null)
+        {
+          return NotFound();
+        }
+
+        conversationEntity.LastMessageStatus = (int) conversation.LastMessageStatus;
+
+        await _context.SaveChangesAsync();
+
+        return Ok();
+      }
+      catch (Exception e)
+      {
+        _logger.LogCritical(e, $"Error while updating conversation last message status, user {HttpContext.User.Identity?.Name}");
+        throw;
+      }
+    }
   }
 }

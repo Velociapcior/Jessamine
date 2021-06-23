@@ -17,9 +17,6 @@ namespace Jessamine.Client.Pages
 
     private string _userName;
 
-    private bool _readLastMessage =>
-      _conversationState.Value.SelectedConversation.LastMessageStatus == MessageStatus.Read;
-
     private long SelectedConversationId => _conversationState.Value.SelectedConversationId;
 
     private long LastMessageId => _conversationState.Value.LastMessageId;

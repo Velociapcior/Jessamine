@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Fluxor;
 using Jessamine.Client.State.Conversation.Actions;
 using Jessamine.Client.State.Messenger.Actions;
+using Jessamine.Shared.Common;
 
 namespace Jessamine.Client.State.Messenger.Effects
 {
@@ -28,9 +29,9 @@ namespace Jessamine.Client.State.Messenger.Effects
       
       if (messages is {Count: > 0})
       {
-        var lastMessageId = messages.Last().Id;
-
         dispatcher.Dispatch(new SetLastMessageId(messages.Last().Id));
+
+        dispatcher.Dispatch(new UpdateLastMessageStatus(action.ConversationId, MessageStatus.Read));
       }
     }
   }

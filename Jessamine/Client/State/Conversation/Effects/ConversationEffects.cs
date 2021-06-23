@@ -9,6 +9,7 @@ using Fluxor;
 using Jessamine.Client.Pages;
 using Jessamine.Client.State.Conversation.Actions;
 using Jessamine.Client.State.Messenger.Actions;
+using Jessamine.Shared.Common;
 
 namespace Jessamine.Client.State.Conversation.Effects
 {
@@ -28,7 +29,7 @@ namespace Jessamine.Client.State.Conversation.Effects
       
       dispatcher.Dispatch(new SaveConversations(conversations));
 
-      if (conversations is {Count: > 0})
+      if (conversations is {})
       {
         long selectedConversationId = action.ConversationId ?? conversations.First().Id;
 
@@ -51,20 +52,47 @@ namespace Jessamine.Client.State.Conversation.Effects
         {
           dispatcher.Dispatch(new SetLastMessageId(messageId));
         };
+
+        dispatcher.Dispatch(new SetLastMessageStatus(action.Message.ConversationId, MessageStatus.Sent));
       }
     }
 
     [EffectMethod]
     public async Task GetNewMessages(GetNewMessages action, IDispatcher dispatcher)
     {
-      var response = await Http.GetFromJsonAsync <List<Jessamine.Shared.Message>>(
-                       $"api/messages/new?mesageId={action.LastMessageId}&conversationId={action.ConversationId}");
-
-      if (response is {Count: > 0})
+      try
       {
-        dispatcher.Dispatch(new SetLastMessageId(response.Last().Id));
+        var response = await Http.GetFromJsonAsync <List<Jessamine.Shared.Message>>(
+          $"api/messages/new?mesageId={action.LastMessageId}&conversationId={action.ConversationId}");
 
-        dispatcher.Dispatch(new AppendMessages(response));
+        if (response is {Count: > 0})
+        {
+          dispatcher.Dispatch(new SetLastMessageId(response.Last().Id));
+
+          dispatcher.Dispatch(new AppendMessages(response));
+
+          dispatcher.Dispatch(new UpdateLastMessageStatus(action.ConversationId, MessageStatus.Read));
+        }
+      }
+      catch
+      {
+        Console.WriteLine("could not download new messages, repeating in 3 seconds");
+      }
+    }
+
+    [EffectMethod]
+    public async Task UpdateLastMessageStatus(UpdateLastMessageStatus action, IDispatcher dispatcher)
+    {
+      var conversation = new Jessamine.Shared.Conversation()
+      {
+        LastMessageStatus = action.Status
+      };
+
+      var response = await Http.PatchAsync($"api/conversations/{action.ConversationId}", JsonContent.Create(conversation));
+
+      if (response.IsSuccessStatusCode)
+      {
+        dispatcher.Dispatch(new SetLastMessageStatus(action.ConversationId, action.Status));
       }
     }
   }

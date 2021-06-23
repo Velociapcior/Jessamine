@@ -24,5 +24,18 @@ namespace Jessamine.Server.Services.Converters
 
       return conversation;
     }
+
+    public Models.Conversation Map(Conversation conversation)
+    {
+      Models.Conversation entity = new Models.Conversation
+      {
+        LastMessage = conversation.LastMessage,
+        LastMessageDate = conversation.LastMessageDate,
+        LastMessageStatus = (int) conversation.LastMessageStatus,
+        StartedDate = conversation.StartedDate
+      };
+
+      return entity;
+    }
   }
 }

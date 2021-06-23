@@ -103,6 +103,5 @@ namespace Jessamine.Server.Controllers
         return BadRequest();
       }
     }
-
   }
 }
