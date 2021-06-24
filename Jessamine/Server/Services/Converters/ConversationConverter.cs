@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Jessamine.Server.Services.Converters.Interfaces;
+﻿using Jessamine.Server.Services.Converters.Interfaces;
 using Jessamine.Shared;
 using Jessamine.Shared.Common;
 
@@ -10,7 +6,7 @@ namespace Jessamine.Server.Services.Converters
 {
   public class ConversationConverter : IConversationConverter
   {
-    public Conversation Map(Models.Conversation entity, string participantName)
+    public Conversation Map(Data.Models.Conversation entity, string participantName)
     {
       Conversation conversation = new Conversation
       {
@@ -25,9 +21,9 @@ namespace Jessamine.Server.Services.Converters
       return conversation;
     }
 
-    public Models.Conversation Map(Conversation conversation)
+    public Data.Models.Conversation Map(Conversation conversation)
     {
-      Models.Conversation entity = new Models.Conversation
+      Data.Models.Conversation entity = new Data.Models.Conversation
       {
         LastMessage = conversation.LastMessage,
         LastMessageDate = conversation.LastMessageDate,

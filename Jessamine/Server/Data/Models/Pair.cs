@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Jessamine.Server.Models
+namespace Jessamine.Server.Data.Models
 {
   public class Pair
   {

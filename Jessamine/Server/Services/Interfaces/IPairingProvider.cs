@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IO.Enumeration;
-using System.Text;
-using Jessamine.Server.Models;
-using Microsoft.Extensions.Primitives;
+using Jessamine.Server.Data.Models;
 
 namespace Jessamine.Server.Services.Interfaces
 {

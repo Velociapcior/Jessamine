@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Jessamine.Server.Models
+namespace Jessamine.Server.Data.Models
 {
   public class Conversation
   {

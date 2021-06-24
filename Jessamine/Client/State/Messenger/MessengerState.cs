@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Jessamine.Shared;
-using Microsoft.AspNetCore.Connections.Features;
 using Fluxor;
 
 namespace Jessamine.Client.State.Messenger

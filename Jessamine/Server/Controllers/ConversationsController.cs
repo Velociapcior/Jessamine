@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Jessamine.Server.Data;
-using Jessamine.Server.Models;
+using Jessamine.Server.Data.Models;
 using Jessamine.Server.Services.Converters.Interfaces;
+using Jessamine.Shared.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace Jessamine.Server.Controllers
@@ -40,6 +41,7 @@ namespace Jessamine.Server.Controllers
     [HttpGet]
     public async Task<IEnumerable<Shared.Conversation>> Get()
     {
+      await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
       try
       {
         ApplicationUser user = await _userManager.GetUserAsync(User);
@@ -49,20 +51,26 @@ namespace Jessamine.Server.Controllers
           .Where(c => c.Participants.Contains(user) && c.Accepted)
           .Include(x => x.Participants)
           .OrderByDescending(x => x.LastMessageDate);
-        
-        var conversations =
-          conversationEntities
-            .Select(x => 
-              _conversationConverter.Map(
-                x, 
-                x.Participants
-                .Single(y =>
-                  y.Id != user.Id).UserName));
+
+        await conversationEntities
+          .Where(x =>
+            x.LastMessageStatus == (int)MessageStatus.Sent && 
+            x.Messages.OrderBy(y => y.Date).Last()
+              .From != user.UserName)
+          .ForEachAsync(x => x.LastMessageStatus = (int)MessageStatus.Received);
+
+        var conversations = conversationEntities.Select(
+          x => _conversationConverter
+            .Map(x, x.Participants.Single(y => y.Id != user.Id).UserName));
+
+        await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         return conversations;
       }
       catch (Exception ex)
       {
+        await transaction.RollbackAsync();
         _logger.LogCritical(ex, $"Error while getting conversation list, user {HttpContext.User.Identity?.Name}");
         throw;
       }
@@ -72,6 +80,7 @@ namespace Jessamine.Server.Controllers
     [Route("{id}")]
     public async Task<IActionResult> Patch(long id, Shared.Conversation conversation)
     {
+      await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
       try
       {
         var conversationEntity = await _context.Conversations.FindAsync(id);
@@ -81,14 +90,16 @@ namespace Jessamine.Server.Controllers
           return NotFound();
         }
 
-        conversationEntity.LastMessageStatus = (int) conversation.LastMessageStatus;
+        conversationEntity.LastMessageStatus = (int)conversation.LastMessageStatus;
 
         await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         return Ok();
       }
       catch (Exception e)
       {
+        await transaction.RollbackAsync();
         _logger.LogCritical(e, $"Error while updating conversation last message status, user {HttpContext.User.Identity?.Name}");
         throw;
       }

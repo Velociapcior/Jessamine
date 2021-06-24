@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Fluxor;
-using Jessamine.Client.Pages;
 using Jessamine.Client.State.Conversation.Actions;
 using Jessamine.Client.State.Messenger.Actions;
 using Jessamine.Shared.Common;
@@ -29,7 +27,7 @@ namespace Jessamine.Client.State.Conversation.Effects
       
       dispatcher.Dispatch(new SaveConversations(conversations));
 
-      if (conversations is {})
+      if (conversations is {Count: > 0})
       {
         long selectedConversationId = action.ConversationId ?? conversations.First().Id;
 

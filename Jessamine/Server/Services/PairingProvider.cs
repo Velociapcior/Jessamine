@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Jessamine.Server.Models;
+using Jessamine.Server.Data.Models;
 using Jessamine.Server.Services.Interfaces;
 
 namespace Jessamine.Server.Services

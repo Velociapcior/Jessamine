@@ -1,7 +1,6 @@
 ﻿@page "/conversations/{ConversationId:long?}"
 
 @using Jessamine.Client.State.Conversation
-@using Jessamine.Client.State.Conversation.Actions
 @using Humanizer
 @using Jessamine.Shared.Common
 
@@ -10,7 +9,7 @@
 @inject IDispatcher _dispatcher
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-@implements IAsyncDisposable
+@implements IDisposable
 
 @inherits FluxorComponent
 
@@ -30,7 +29,7 @@
         <div class="list-group rounded-0">
           @foreach (var conversation in _conversationState.Value.Conversations)
           {
-            bool readLastMessage = conversation.LastMessageStatus == MessageStatus.Read;
+            bool readLastMessage = conversation.LastMessageStatus != MessageStatus.Received;
 
             if (conversation.Id == _conversationState.Value.SelectedConversationId)
             {

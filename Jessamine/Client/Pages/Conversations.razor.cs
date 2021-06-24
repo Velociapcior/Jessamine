@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Jessamine.Client.State.Conversation.Actions;
-using Jessamine.Shared.Common;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Jessamine.Client.Pages
 {
@@ -22,6 +18,12 @@ namespace Jessamine.Client.Pages
     private long LastMessageId => _conversationState.Value.LastMessageId;
 
     private Timer _timer;
+    private readonly ManualResetEvent TimerDisposed;
+
+    public Conversations()
+    {
+      TimerDisposed = new ManualResetEvent(false);
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,15 +37,22 @@ namespace Jessamine.Client.Pages
 
     protected override void OnAfterRender(bool firstRender)
     {
-      if (firstRender)
+      try
       {
-        _dispatcher.Dispatch(new FetchConversations(ConversationId));
-      }
+        if (firstRender)
+        {
+          _dispatcher.Dispatch(new FetchConversations(ConversationId));
+        }
 
-      _timer = new Timer(state =>
+        _timer = new Timer(state =>
+        {
+          _dispatcher.Dispatch(new GetNewMessages(SelectedConversationId, LastMessageId));
+        }, null, 3000, 5000);
+      }
+      catch (Exception e)
       {
-        _dispatcher.Dispatch(new GetNewMessages(SelectedConversationId, LastMessageId));
-      }, null, 3000, 5000);
+        Console.WriteLine(e);
+      }
     }
 
     private void Send(string input)
@@ -70,9 +79,14 @@ namespace Jessamine.Client.Pages
       _dispatcher.Dispatch(new SetSelectedConversation(id));
     }
 
-    public async ValueTask DisposeAsync()
+    public new void Dispose()
     {
-      await new Task(() => {});
+      _timer.Dispose(TimerDisposed);
+
+      TimerDisposed.WaitOne();
+      TimerDisposed.Dispose();
+
+      base.Dispose();
     }
   }
 }

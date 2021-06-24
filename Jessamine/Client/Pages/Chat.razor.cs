@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Fluxor.Blazor.Web.Components;
 using Jessamine.Client.State.Chat.Actions;
 using Jessamine.Client.State.Messenger.Actions;
 using Jessamine.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Jessamine.Client.Pages
